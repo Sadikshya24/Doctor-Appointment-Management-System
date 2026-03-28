@@ -1,0 +1,101 @@
+    body {
+        font-family: 'Outfit', sans-serif;
+        background-color: #f0f4f8;
+        margin: 0;
+        padding: 0;
+    }
+
+    .dashboard-container {
+        max-width: 1000px;
+        margin: 50px auto;
+        background: #fff;
+        padding: 30px;
+        border-radius: 10px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 2px solid #5995fd;
+        padding-bottom: 15px;
+        margin-bottom: 30px;
+    }
+
+    .header h1 {
+        color: #333;
+        margin: 0;
+    }
+
+    .btn-logout {
+        background-color: #5995fd;
+        color: #fff;
+        text-decoration: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        font-weight: 600;
+        transition: 0.3s;
+    }
+
+    .btn-logout:hover {
+        background-color: #4d84e2;
+    }
+
+    .user-info {
+        font-size: 1.1em;
+        color: #555;
+        line-height: 1.6;
+    }
+
+    .welcome-message {
+        font-size: 1.5em;
+        color: #333;
+        margin-bottom: 20px;
+    }
+
+    .role-badge {
+        display: inline-block;
+        background-color: #5995fd;
+        color: white;
+        padding: 5px 10px;
+        border-radius: 15px;
+        font-size: 0.9em;
+        font-weight: 600;
+    }
+
+    /* Hospital Management Styles */
+    .superadmin-section h3 {
+        margin-bottom: 20px;
+        color: #1e3a8a;
+        font-size: 1.4rem;
+    }
+
+    .admin-card {
+        background: #ffffff;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        transition: transform 0.2s ease;
+    }
+
+    .admin-card h4 {
+        margin-bottom: 15px;
+        color: #333;
+        border-bottom: 1px solid #eee;
+        padding-bottom: 10px;
+    }
+
+    .btn-admin {
+        background: #3b82f6 !important;
+        color: white !important;
+        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.25);
+        transition: all 0.3s ease;
+    }
+
+    .btn-admin:hover {
+        background: #2563eb !important;
+        transform: translateY(-2px);
+    }
+
+    .hospital-item:hover {
+        background: #f9fafb;
+    }
