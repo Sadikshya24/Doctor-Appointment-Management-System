@@ -73,6 +73,7 @@ CREATE TABLE IF NOT EXISTS `reports` (
   `diagnosis` varchar(255) DEFAULT NULL,
   `report_details` text DEFAULT NULL,
   `prescription` text DEFAULT NULL,
+  `details` text NOT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   PRIMARY KEY (`id`),
   FOREIGN KEY (`appointment_id`) REFERENCES `appointments`(`id`) ON DELETE SET NULL,
@@ -147,4 +148,5 @@ INSERT IGNORE INTO `doctors` (`id`, `user_id`, `hospital_id`, `speciality`, `des
 (1, 2001, 1, 'Cardiologist', '10+ years of experience in heart care.'),
 (2, 2002, 1, 'Dermatologist', 'Expert in skincare and cosmetic procedures.'),
 (3, 2003, 2, 'Pediatrician', 'Child healthcare specialist.'),
+(4, 2004, 3, 'Neurologist', 'Specialized in brain and nervous system functioning.');
 (4, 2004, 3, 'Neurologist', 'Specialized in brain and nervous system functioning.');
