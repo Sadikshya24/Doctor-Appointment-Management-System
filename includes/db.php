@@ -1,8 +1,8 @@
 <?php
-$host = 'localhost'; 
+$host = 'localhost';
 $db = 'healthcare_portal';
 $user = 'root'; //
-$pass = ''; 
+$pass = '';
 
 $dsn = "mysql:host=$host;dbname=$db;charset=utf8mb4";
 $options = [

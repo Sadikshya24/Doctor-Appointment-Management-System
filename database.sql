@@ -69,6 +69,10 @@ CREATE TABLE IF NOT EXISTS `reports` (
   `appointment_id` int(11) DEFAULT NULL,
   `patient_id` int(11) NOT NULL,
   `doctor_id` int(11) NOT NULL,
+  `details` text DEFAULT NULL,
+  `diagnosis` varchar(255) DEFAULT NULL,
+  `report_details` text DEFAULT NULL,
+  `prescription` text DEFAULT NULL,
   `details` text NOT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   PRIMARY KEY (`id`),
@@ -84,6 +88,33 @@ CREATE TABLE IF NOT EXISTS `password_resets` (
   `token` varchar(255) NOT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Patient Info Table
+CREATE TABLE IF NOT EXISTS `patient_info` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` int(11) NOT NULL,
+  `age` int(11) DEFAULT NULL,
+  `height` varchar(50) DEFAULT NULL,
+  `weight` int(11) DEFAULT NULL,
+  `blood_group` varchar(10) DEFAULT NULL,
+  `emergency_contact` varchar(20) DEFAULT NULL,
+  `medications` text DEFAULT NULL,
+  `medical_history` text DEFAULT NULL,
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  PRIMARY KEY (`id`),
+  FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Patient Files Table
+CREATE TABLE IF NOT EXISTS `patient_files` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` int(11) NOT NULL,
+  `file_name` varchar(255) NOT NULL,
+  `file_path` varchar(255) NOT NULL,
+  `uploaded_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- ==========================================
@@ -117,4 +148,5 @@ INSERT IGNORE INTO `doctors` (`id`, `user_id`, `hospital_id`, `speciality`, `des
 (1, 2001, 1, 'Cardiologist', '10+ years of experience in heart care.'),
 (2, 2002, 1, 'Dermatologist', 'Expert in skincare and cosmetic procedures.'),
 (3, 2003, 2, 'Pediatrician', 'Child healthcare specialist.'),
+(4, 2004, 3, 'Neurologist', 'Specialized in brain and nervous system functioning.');
 (4, 2004, 3, 'Neurologist', 'Specialized in brain and nervous system functioning.');
