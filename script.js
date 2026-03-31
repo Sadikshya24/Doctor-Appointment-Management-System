@@ -1,5 +1,8 @@
 const BASE = "http://localhost/admin_dashboard/api.php?path=";
 
+let currentData = [];
+let currentPage = "";
+
 document.querySelectorAll(".sidebar li").forEach(item => {
   item.addEventListener("click", function () {
     const pageId = this.getAttribute("data-page");
@@ -29,92 +32,91 @@ async function loadDashboard() {
 }
 
 async function loadDoctors() {
-  const table = document.getElementById("doctorTable");
-
-  const res = await fetch(BASE + "doctors/pending");
+  const res = await fetch(BASE + "doctors");
   const data = await res.json();
 
-  table.innerHTML = "";
+  currentData = data;
+  currentPage = "doctors";
 
-  if (!data.length) {
-    table.innerHTML = "<tr><td colspan='4'>No pending doctors</td></tr>";
-    return;
-  }
-
-  data.forEach(doc => {
-    table.innerHTML += `
-      <tr>
-        <td>${doc.name}</td>
-        <td>${doc.nmcNumber}</td>
-        <td><a href="${doc.cv_file}" target="_blank">📄 View CV</a></td>
-        <td>
-          <button onclick="verifyDoctor(${doc.id})">Approve</button>
-          <button onclick="rejectDoctor(${doc.id})">Reject</button>
-        </td>
-      </tr>`;
-  });
+  renderTable(data);
 }
 
-async function verifyDoctor(id) {
-  await fetch(BASE + `doctors/${id}/verify`, { method: "POST" });
+async function updateDoctor(id) {
+  const name = prompt("Enter new name:");
+  const nmcNumber = prompt("Enter new NMC Number:");
+
+  if (!name || !nmcNumber) return;
+
+  await fetch(BASE + `doctors/${id}/update`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ name, nmcNumber })
+  });
+
   loadDoctors();
   loadLogs();
 }
 
-async function rejectDoctor(id) {
-  await fetch(BASE + `doctors/${id}/reject`, { method: "POST" });
+async function deleteDoctor(id) {
+  if (!confirm("Delete this doctor?")) return;
+
+  await fetch(BASE + `doctors/${id}/delete`, { method: "POST" });
+
   loadDoctors();
   loadLogs();
 }
 
 async function loadAppointments() {
-  const table = document.getElementById("appointmentTable");
-
-  try {
-    const res = await fetch(BASE + "appointments");
-    const data = await res.json();
-
-    table.innerHTML = "";
-
-    if (!data.length) {
-      table.innerHTML = "<tr><td colspan='3'>No appointments</td></tr>";
-      return;
-    }
-
-    data.forEach(a => {
-      table.innerHTML += `
-        <tr>
-          <td>${a.patient}</td>
-          <td>${a.doctor}</td>
-          <td>${a.status}</td>
-        </tr>`;
-    });
-
-  } catch {
-    table.innerHTML = "<tr><td colspan='3'>Error loading</td></tr>";
-  }
-}
-
-async function loadPatients() {
-  const table = document.getElementById("patientTable");
-
-  const res = await fetch(BASE + "patients");
+  const res = await fetch(BASE + "appointments");
   const data = await res.json();
 
-  table.innerHTML = "";
+  currentData = data;
+  currentPage = "appointments";
 
-  if (!data.length) {
-    table.innerHTML = "<tr><td>No patients</td></tr>";
+  renderTable(data);
+}
+
+async function cancelAppointment(id) {
+  if (!confirm("Cancel this appointment?")) return;
+
+  await fetch(BASE + `appointments/${id}/cancel`, { method: "POST" });
+
+  loadAppointments();
+  loadLogs();
+}
+
+async function rescheduleAppointment(id) {
+  const date = prompt("Enter new date (YYYY-MM-DD):");
+  const time = prompt("Enter new time (HH:MM)");
+
+  if (!date || !time) return;
+
+  const selectedDate = new Date(date);
+  const now = new Date();
+
+  if (selectedDate < now) {
+    alert("Cannot select past date");
     return;
   }
 
-  data.forEach(p => {
-    table.innerHTML += `
-      <tr>
-        <td>${p.name}</td>
-        <td>${p.status}</td>
-      </tr>`;
+  await fetch(BASE + `appointments/${id}/reschedule`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ date, time })
   });
+
+  loadAppointments();
+  loadLogs();
+}
+
+async function loadPatients() {
+  const res = await fetch(BASE + "patients");
+  const data = await res.json();
+
+  currentData = data;
+  currentPage = "patients";
+
+  renderTable(data);
 }
 
 async function loadLogs() {
@@ -132,8 +134,7 @@ async function loadLogs() {
     }
 
     data.forEach(log => {
-      list.innerHTML += `
-        <li>${log.message} by <b>${log.user}</b> (${log.created_at})</li>`;
+      list.innerHTML += `<li>${log.message} by <b>${log.user}</b> (${log.created_at})</li>`;
     });
 
   } catch {
@@ -154,9 +155,6 @@ async function loadStats() {
   `;
 }
 
-let currentData = [];
-let currentPage = "";
-
 document.getElementById("searchInput").addEventListener("input", function () {
   const value = this.value.toLowerCase();
 
@@ -171,22 +169,65 @@ document.getElementById("searchInput").addEventListener("input", function () {
   renderTable(filtered);
 });
 
-async function loadPatients() {
-  const table = document.getElementById("patientTable");
-
-  const res = await fetch(BASE + "patients");
-  const data = await res.json();
-
-  currentData = data;
-  currentPage = "patients";
-
-  renderTable(data);
-}
-
 function renderTable(data) {
+
+  if (currentPage === "doctors") {
+    const table = document.getElementById("doctorTable");
+    table.innerHTML = "";
+
+    if (!data.length) {
+      table.innerHTML = "<tr><td>No doctors</td></tr>";
+      return;
+    }
+
+    data.forEach(doc => {
+      table.innerHTML += `
+        <tr>
+          <td>${doc.name}</td>
+          <td>${doc.nmcNumber}</td>
+          <td>${doc.status}</td>
+          <td>
+            <button onclick="updateDoctor(${doc.id})">Update</button>
+            <button onclick="deleteDoctor(${doc.id})">Delete</button>
+          </td>
+        </tr>`;
+    });
+  }
+
+  if (currentPage === "appointments") {
+    const table = document.getElementById("appointmentTable");
+    table.innerHTML = "";
+
+    if (!data.length) {
+      table.innerHTML = "<tr><td colspan='7'>No appointments</td></tr>";
+      return;
+    }
+
+    data.forEach(a => {
+      table.innerHTML += `
+        <tr>
+          <td>${a.id}</td>
+          <td>${a.patient}</td>
+          <td>${a.doctor}</td>
+          <td>${a.date}</td>
+          <td>${a.time}</td>
+          <td>${a.status}</td>
+          <td>
+            <button onclick="cancelAppointment(${a.id})">Cancel</button>
+            <button onclick="rescheduleAppointment(${a.id})">Reschedule</button>
+          </td>
+        </tr>`;
+    });
+  }
+
   if (currentPage === "patients") {
     const table = document.getElementById("patientTable");
     table.innerHTML = "";
+
+    if (!data.length) {
+      table.innerHTML = "<tr><td>No patients</td></tr>";
+      return;
+    }
 
     data.forEach(p => {
       table.innerHTML += `
@@ -196,46 +237,6 @@ function renderTable(data) {
         </tr>`;
     });
   }
-
-  if (currentPage === "appointments") {
-    const table = document.getElementById("appointmentTable");
-    table.innerHTML = "";
-
-    data.forEach(a => {
-      table.innerHTML += `
-        <tr>
-          <td>${a.patient}</td>
-          <td>${a.doctor}</td>
-          <td>${a.status}</td>
-        </tr>`;
-    });
-  }
-
-  if (currentPage === "doctors") {
-    const table = document.getElementById("doctorTable");
-    table.innerHTML = "";
-
-    data.forEach(doc => {
-      table.innerHTML += `
-        <tr>
-          <td>${doc.name}</td>
-          <td>${doc.nmcNumber}</td>
-          <td><a href="${doc.cv_file}" target="_blank">📄</a></td>
-          <td>
-            <button onclick="verifyDoctor(${doc.id})">Approve</button>
-            <button onclick="rejectDoctor(${doc.id})">Reject</button>
-          </td>
-        </tr>`;
-    });
-  }
 }
-async function loadAppointments() {
-  const res = await fetch(BASE + "appointments");
-  const data = await res.json();
 
-  currentData = data;
-  currentPage = "appointments";
-
-  renderTable(data);
-}
 loadDashboard();
