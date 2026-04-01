@@ -9,10 +9,10 @@
 
 <div class="layout">
   <aside class="sidebar">
-    <h2>CureX</h2>
+    <h2>MedScape</h2>
     <ul>
       <li data-page="dashboard" class="active">Dashboard</li>
-      <li data-page="doctors">Doctor Verification</li>
+      <li data-page="doctors">Doctors</li>
       <li data-page="appointments">Appointments</li>
       <li data-page="patients">Patients</li>
       <li data-page="logs">Logs</li>
@@ -25,6 +25,7 @@
       <input type="text" id="searchInput" placeholder="Search...">
     </div>
 
+    <!-- DASHBOARD (UNCHANGED) -->
     <section id="dashboard" class="page active">
       <div class="cards">
         <div class="card">
@@ -35,8 +36,7 @@
 
         <div class="card">
           <h4>Revenue Generated</h4>
-          <h2>Rs. 20,000
-          </h2>
+          <h2>Rs. 20,000</h2>
         </div>
 
         <div class="card">
@@ -86,14 +86,15 @@
       </div>
     </section>
 
+    <!-- DOCTORS (UPDATED) -->
     <section id="doctors" class="page">
-      <h1>Doctor Verification</h1>
+      <h1>Doctors</h1>
       <table>
         <thead>
           <tr>
             <th>Name</th>
             <th>NMC</th>
-            <th>CV</th>
+            <th>Status</th>
             <th>Action</th>
           </tr>
         </thead>
@@ -101,32 +102,46 @@
       </table>
     </section>
 
+    <!-- APPOINTMENTS (UPDATED) -->
     <section id="appointments" class="page">
       <h1>Appointments</h1>
       <table>
         <thead>
           <tr>
+            <th>ID</th>
             <th>Patient</th>
             <th>Doctor</th>
+            <th>Date</th>
+            <th>Time</th>
             <th>Status</th>
+            <th>Action</th>
           </tr>
         </thead>
         <tbody id="appointmentTable"></tbody>
       </table>
     </section>
 
+    <!-- PATIENTS (FIXED HEADERS) -->
     <section id="patients" class="page">
       <h1>Patients</h1>
       <table>
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Status</th>
+          </tr>
+        </thead>
         <tbody id="patientTable"></tbody>
       </table>
     </section>
 
+    <!-- LOGS -->
     <section id="logs" class="page">
       <h1>Logs</h1>
       <ul id="logList"></ul>
     </section>
 
+    <!-- STATS -->
     <section id="stats" class="page">
       <h1>Statistics</h1>
       <div id="statsData"></div>
