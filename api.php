@@ -89,6 +89,35 @@ if ($path === "patients") {
     exit;
 }
 
+// UPDATE PATIENT STATUS
+if ($method === "POST" && preg_match('/patients\/(\d+)\/update/', $path, $m)) {
+    $id = intval($m[1]);
+
+    $data = json_decode(file_get_contents("php://input"), true);
+    $status = $conn->real_escape_string($data['status']);
+
+    if ($conn->query("UPDATE patients SET status='$status' WHERE id=$id")) {
+        $conn->query("INSERT INTO logs (action,user) VALUES ('Patient updated ID $id','Admin')");
+        echo json_encode(["success"=>true]);
+    } else {
+        echo json_encode(["error"=>"Update failed"]);
+    }
+    exit;
+}
+
+// DELETE PATIENT
+if ($method === "POST" && preg_match('/patients\/(\d+)\/delete/', $path, $m)) {
+    $id = intval($m[1]);
+
+    if ($conn->query("DELETE FROM patients WHERE id=$id")) {
+        $conn->query("INSERT INTO logs (action,user) VALUES ('Patient deleted ID $id','Admin')");
+        echo json_encode(["success"=>true]);
+    } else {
+        echo json_encode(["error"=>"Delete failed"]);
+    }
+    exit;
+}
+
 if ($path === "appointments") {
     $res = $conn->query("
         SELECT 
@@ -156,6 +185,51 @@ if ($path === "stats") {
         "doctors"=>$d['c'],
         "appointments"=>$a['c']
     ]);
+    exit;
+}
+if ($path === "appointment-stats") {
+
+    $success = $conn->query("SELECT COUNT(*) as c FROM appointments WHERE status='completed'")->fetch_assoc();
+    $cancelled = $conn->query("SELECT COUNT(*) as c FROM appointments WHERE status='cancelled'")->fetch_assoc();
+
+    echo json_encode([
+        "successful" => $success['c'],
+        "cancelled" => $cancelled['c']
+    ]);
+    exit;
+}
+
+// GET HOSPITAL PROFILE
+if ($path === "hospital/profile") {
+
+    $res = $conn->query("
+        SELECT u.name, u.email, u.phone, h.location 
+        FROM hospitals h
+        JOIN users u ON h.user_id = u.id
+        LIMIT 1
+    ");
+
+    echo json_encode($res->fetch_assoc());
+    exit;
+}
+
+// UPDATE HOSPITAL PROFILE
+if ($method === "POST" && $path === "hospital/profile/update") {
+
+    $data = json_decode(file_get_contents("php://input"), true);
+
+    $name = $conn->real_escape_string($data['name']);
+    $email = $conn->real_escape_string($data['email']);
+    $phone = $conn->real_escape_string($data['phone']);
+    $location = $conn->real_escape_string($data['location']);
+
+    // update user
+    $conn->query("UPDATE users SET name='$name', email='$email', phone='$phone' WHERE id=1");
+
+    // update hospital
+    $conn->query("UPDATE hospitals SET location='$location' WHERE user_id=1");
+
+    echo json_encode(["success"=>true]);
     exit;
 }
 

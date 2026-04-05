@@ -29,6 +29,9 @@ async function loadDashboard() {
   document.getElementById("patientCount").innerText = data.patients;
   document.getElementById("doctorCount").innerText = data.doctors;
   document.getElementById("appointmentCount").innerText = data.appointments;
+
+  loadAdmissionChart();
+  loadPaymentChart();
 }
 
 async function loadDoctors() {
@@ -119,6 +122,37 @@ async function loadPatients() {
   renderTable(data);
 }
 
+async function updatePatient(id) {
+  const status = prompt("Enter status (Active / Suspended):");
+
+  if (!status) return;
+
+  if (!["Active", "Suspended"].includes(status)) {
+    alert("Only 'Active' or 'Suspended' allowed");
+    return;
+  }
+
+  await fetch(BASE + `patients/${id}/update`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ status })
+  });
+
+  loadPatients();
+  loadLogs();
+}
+
+async function deletePatient(id) {
+  if (!confirm("Delete this patient?")) return;
+
+  await fetch(BASE + `patients/${id}/delete`, {
+    method: "POST"
+  });
+
+  loadPatients();
+  loadLogs();
+}
+
 async function loadLogs() {
   const list = document.getElementById("logList");
 
@@ -145,15 +179,29 @@ async function loadLogs() {
 async function loadStats() {
   const div = document.getElementById("statsData");
 
-  const res = await fetch(BASE + "stats");
+  const res = await fetch(BASE + "appointment-stats");
   const data = await res.json();
 
   div.innerHTML = `
-    <p>Patients: ${data.patients}</p>
-    <p>Doctors: ${data.doctors}</p>
-    <p>Appointments: ${data.appointments}</p>
+    <h3>Appointment Report</h3>
+
+    <p>Successful: ${data.successful}</p>
+    <p>Cancelled: ${data.cancelled}</p>
   `;
 }
+div.innerHTML = `
+  <h3>Appointment Report</h3>
+
+  <div style="margin-top:10px;">
+    <div>Successful (${data.successful})</div>
+    <div style="background:green;height:20px;width:${data.successful * 20}px;"></div>
+  </div>
+
+  <div style="margin-top:10px;">
+    <div>Cancelled (${data.cancelled})</div>
+    <div style="background:red;height:20px;width:${data.cancelled * 20}px;"></div>
+  </div>
+`;
 
 document.getElementById("searchInput").addEventListener("input", function () {
   const value = this.value.toLowerCase();
@@ -181,16 +229,22 @@ function renderTable(data) {
     }
 
     data.forEach(doc => {
-      table.innerHTML += `
-        <tr>
-          <td>${doc.name}</td>
-          <td>${doc.nmcNumber}</td>
-          <td>${doc.status}</td>
-          <td>
-            <button onclick="updateDoctor(${doc.id})">Update</button>
-            <button onclick="deleteDoctor(${doc.id})">Delete</button>
-          </td>
-        </tr>`;
+    table.innerHTML += `
+    <tr>
+      <td>${doc.name}</td>
+      <td>${doc.nmcNumber}</td>
+
+      <td>
+      <button onclick="viewCV('${doc.cv_file || ''}')">View CV</button>
+      </td>
+
+      <td>${doc.status}</td>
+
+      <td>
+        <button onclick="updateDoctor(${doc.id})">Update</button>
+        <button onclick="deleteDoctor(${doc.id})">Delete</button>
+      </td>
+    </tr>`;
     });
   }
 
@@ -234,9 +288,119 @@ function renderTable(data) {
         <tr>
           <td>${p.name}</td>
           <td>${p.status}</td>
+          <td> <button onclick="updatePatient(${p.id})">Update</button>
+          <button onclick="deletePatient(${p.id})">Delete</button>
+  </td>
         </tr>`;
     });
   }
+  function viewCV(file) {
+  window.open(`uploads/${file}`, "_blank");
+}
+function viewCV(file) {
+  if (!file) {
+    alert("No CV uploaded for this doctor");
+    return;
+  }
+
+  window.open(`uploads/${file}`, "_blank");
+}
+function loadAdmissionChart() {
+  const ctx = document.getElementById('admissionChart');
+
+  new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+      datasets: [{
+        label: 'Admissions',
+        data: [5, 8, 6, 10, 7, 12, 9],
+        tension: 0.4
+      }]
+    }
+  });
 }
 
+function loadPaymentChart() {
+  const ctx = document.getElementById('paymentChart');
+
+  new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+      labels: ['Paid', 'Pending'],
+      datasets: [{
+        data: [15000, 5000]
+      }]
+    }
+  });
+}
+}
+// LOAD HOSPITAL PROFILE
+async function loadHospitalProfile() {
+  const res = await fetch(BASE + "hospital/profile");
+  const data = await res.json();
+
+  document.getElementById("h_name").value = data.name || "";
+  document.getElementById("h_email").value = data.email || "";
+  document.getElementById("h_phone").value = data.phone || "";
+  document.getElementById("h_location").value = data.location || "";
+}
+
+// SAVE
+async function saveHospitalProfile() {
+  const name = document.getElementById("h_name").value;
+  const email = document.getElementById("h_email").value;
+  const phone = document.getElementById("h_phone").value;
+  const location = document.getElementById("h_location").value;
+
+  await fetch(BASE + "hospital/profile/update", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ name, email, phone, location })
+  });
+
+  alert("Hospital profile updated!");
+}
+
+// LOGO (TEMP)
+function uploadLogo() {
+  alert("Logo uploaded (demo)");
+}
+if (page === "hospital") {
+  loadHospitalProfile();
+}
+function loadAdmissionChart() {
+  const ctx = document.getElementById('admissionChart');
+
+  if (!ctx) return;
+
+  new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+      datasets: [{
+        label: 'Admissions',
+        data: [5, 8, 6, 10, 7, 12, 9],
+        tension: 0.4
+      }]
+    }
+  });
+}
+
+async function loadPaymentChart() {
+  const res = await fetch(BASE + "appointment-stats");
+  const data = await res.json();
+
+  const ctx = document.getElementById('paymentChart');
+
+  new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+      labels: ['Successful', 'Cancelled'],
+      datasets: [{
+        data: [data.successful, data.cancelled]
+      }]
+    }
+  });
+}
 loadDashboard();
