@@ -1,0 +1,253 @@
+    :root {
+        --primary: var(--primary-color);
+    }
+
+    .pd-container {
+        margin-top: 30px;
+        font-family: 'Outfit', sans-serif;
+    }
+
+    /* Tabs Navigation */
+    .pd-tabs {
+        display: flex;
+        gap: 15px;
+        border-bottom: 2px solid var(--border-color);
+        margin-bottom: 20px;
+    }
+
+    .pd-tab {
+        padding: 10px 20px;
+        cursor: pointer;
+        font-size: 1.1em;
+        font-weight: 500;
+        color: var(--text-muted);
+        border-bottom: 3px solid transparent;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .pd-tab:hover {
+        color: var(--primary);
+    }
+
+    .pd-tab.active {
+        color: var(--primary);
+        border-bottom: 3px solid var(--primary);
+    }
+
+    /* Content Area */
+    .pd-content {
+        display: none;
+        animation: fadeIn 0.4s ease;
+    }
+
+    .pd-content.active {
+        display: block;
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* Cards & Grid for Lists */
+    .pd-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 20px;
+    }
+
+    .pd-card {
+        background: var(--bg-card);
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        padding: 20px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.04);
+        transition: transform 0.2s, box-shadow 0.2s;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .pd-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+    }
+
+    .pd-card h4 {
+        margin: 0 0 10px 0;
+        color: var(--text-main);
+        font-size: 1.2em;
+    }
+
+    .pd-card p {
+        color: var(--text-muted);
+        font-size: 0.95em;
+        margin: 5px 0;
+        line-height: 1.5;
+    }
+
+    .pd-card .badge {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: 0.8em;
+        font-weight: 600;
+        color: #fff;
+    }
+
+    .badge-scheduled {
+        background: var(--primary);
+    }
+
+    .badge-completed {
+        background: var(--success);
+    }
+
+    .badge-cancelled {
+        background: var(--danger);
+    }
+
+    .badge-missed {
+        background: #6c757d;
+    }
+
+    /* Forms & Filters */
+    .pd-filter-bar {
+        background: var(--primary-light);
+        padding: 15px 20px;
+        border-radius: 10px;
+        margin-bottom: 25px;
+        display: flex;
+        gap: 15px;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+
+    .pd-form-group {
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+        min-width: 200px;
+    }
+
+    .pd-form-group label {
+        font-size: 0.9em;
+        font-weight: 600;
+        margin-bottom: 5px;
+        color: var(--text-main);
+    }
+
+    .pd-input {
+        padding: 10px 15px;
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        font-family: inherit;
+        font-size: 1em;
+        transition: border-color 0.3s;
+    }
+
+    .pd-input:focus {
+        border-color: var(--primary);
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(89, 149, 253, 0.2);
+    }
+
+    .pd-btn {
+        background: var(--primary);
+        color: #fff;
+        border: none;
+        border-radius: 8px;
+        padding: 12px 20px;
+        font-size: 1em;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.3s, transform 0.1s;
+        font-family: inherit;
+        align-self: flex-end;
+    }
+
+    .pd-btn:hover {
+        background: var(--primary-hover);
+    }
+
+    .pd-btn:active {
+        transform: scale(0.98);
+    }
+
+    .pd-btn-danger {
+        background: var(--danger);
+    }
+
+    .pd-btn-danger:hover {
+        background: #c82333;
+    }
+
+    /* Booking Modal */
+    .pd-modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.5);
+        display: none;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+        backdrop-filter: blur(4px);
+    }
+
+    .pd-modal-overlay.active {
+        display: flex;
+    }
+
+    .pd-modal {
+        background: #fff;
+        padding: 30px;
+        border-radius: 15px;
+        width: 90%;
+        max-width: 500px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    }
+
+    .pd-modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+
+    .pd-modal-header h3 {
+        margin: 0;
+    }
+
+    .pd-modal-close {
+        background: none;
+        border: none;
+        font-size: 1.5em;
+        cursor: pointer;
+        color: var(--text-muted);
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 40px 20px;
+        color: var(--text-muted);
+    }
+
+    .empty-state i {
+        font-size: 3em;
+        color: #ccc;
+        margin-bottom: 15px;
+    }
