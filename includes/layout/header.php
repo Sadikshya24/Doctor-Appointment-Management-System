@@ -7,6 +7,10 @@
     <title>
         <?php echo isset($pageTitle) ? htmlspecialchars($pageTitle) : 'MedScape'; ?>
     </title>
+<<<<<<< HEAD
+=======
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+>>>>>>> khushi
     <?php $basePath = isset($isSubFolder) && $isSubFolder ? '../' : ''; ?>
     <link rel="stylesheet" href="<?php echo $basePath; ?>assets/css/common/style.css">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
