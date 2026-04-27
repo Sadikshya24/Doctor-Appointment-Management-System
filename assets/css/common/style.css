@@ -191,6 +191,38 @@ body {
     font-weight: 400;
 }
 
+/* Real-time Validation Errors */
+.input-error-msg {
+    color: var(--danger);
+    font-size: 0.8rem;
+    margin-top: 0;
+    margin-bottom: 15px;
+    margin-left: 5px;
+    display: none;
+    text-align: left;
+    animation: fadeIn 0.3s ease;
+    font-weight: 500;
+}
+
+.input-field.has-error {
+    border-color: var(--danger);
+    background: #fef2f2;
+    margin-bottom: 4px; /* Reduced from 20px to make room for the error text right below */
+}
+
+.input-field.has-error i {
+    color: var(--danger);
+}
+
+.input-field.has-success {
+    border-color: var(--success);
+}
+
+.input-field.has-success i {
+    color: var(--success);
+}
+
+
 /* Roles */
 .role-selector {
     margin-bottom: 15px;
