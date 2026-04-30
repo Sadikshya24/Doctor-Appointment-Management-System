@@ -16,6 +16,22 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
+    // Password visibility toggle
+    const togglePasswordIcons = document.querySelectorAll('.toggle-password');
+    togglePasswordIcons.forEach(icon => {
+        icon.addEventListener('click', function() {
+            const input = this.parentElement.querySelector('input');
+            if (input.type === 'password') {
+                input.type = 'text';
+                this.classList.remove('fa-eye');
+                this.classList.add('fa-eye-slash');
+            } else {
+                input.type = 'password';
+                this.classList.remove('fa-eye-slash');
+                this.classList.add('fa-eye');
+            }
+        });
+    });
     // Toggle doctor fields on signup
     const roleRadios = document.querySelectorAll('#signup input[name="role"]');
     const doctorFields = document.getElementById('doctor-fields');

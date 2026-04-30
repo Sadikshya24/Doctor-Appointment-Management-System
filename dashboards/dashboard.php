@@ -78,9 +78,10 @@ require_once '../includes/layout/header.php';
                                     style="width: 100%; border: none; padding: 10px; background: transparent; color: var(--text-main);">
                             </div>
                             <div class="input-field"
-                                style="margin-bottom: 10px; border: 1px solid var(--border-color); padding: 5px 15px; border-radius: 8px;">
+                                style="margin-bottom: 10px; border: 1px solid var(--border-color); padding: 5px 15px; border-radius: 8px; display: flex; align-items: center;">
                                 <input type="password" name="password" placeholder="Password" required
-                                    style="width: 100%; border: none; padding: 10px; background: transparent; color: var(--text-main);">
+                                    style="flex: 1; border: none; padding: 10px; background: transparent; color: var(--text-main); outline: none;">
+                                <i class="fas fa-eye toggle-password" style="cursor: pointer; color: var(--text-muted);" title="Toggle password visibility"></i>
                             </div>
                             <div class="input-field"
                                 style="margin-bottom: 20px; border: 1px solid var(--border-color); padding: 5px 15px; border-radius: 8px;">

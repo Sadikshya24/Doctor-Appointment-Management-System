@@ -100,7 +100,10 @@ include '../includes/layout/header.php';
                         </div>
                         <div class="input-field-modern">
                             <label>Password</label>
-                            <input type="password" name="password" required>
+                            <div style="position: relative; display: flex; align-items: center;">
+                                <input type="password" name="password" required style="width: 100%; padding-right: 40px;">
+                                <i class="fas fa-eye toggle-password" style="position: absolute; right: 15px; cursor: pointer; color: var(--admin-text-light);" title="Toggle password visibility"></i>
+                            </div>
                         </div>
                         <div class="input-field-modern">
                             <label>Phone Number</label>
