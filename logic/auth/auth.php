@@ -124,6 +124,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $hospital_id = $_POST['hospital_id'] ?? '';
                 $cv_path = '';
 
+                if (!preg_match('/^[0-9]{3,6}$/', $nmc_number)) {
+                    $_SESSION['auth_error'] = 'Invalid NMC Number. It must be numeric and 3-6 digits only.';
+                    header('Location: ../../login.php');
+                    exit;
+                }
+
+                // Check if NMC number clashes with an already approved doctor
+                $stmt_nmc = $pdo->prepare("SELECT id FROM doctors WHERE nmc_number = ? AND status = 'approved'");
+                $stmt_nmc->execute([$nmc_number]);
+                if ($stmt_nmc->fetch()) {
+                    $_SESSION['auth_error'] = 'This NMC number is already registered to an approved doctor.';
+                    header('Location: ../../login.php');
+                    exit;
+                }
+
                 if (empty($hospital_id)) {
                     $_SESSION['auth_error'] = 'Doctors must strictly select an affiliated hospital during signup.';
                     header('Location: ../../login.php');
