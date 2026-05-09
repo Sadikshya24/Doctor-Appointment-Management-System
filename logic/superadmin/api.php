@@ -26,7 +26,7 @@ try {
 
     // 5. HOSPITALS
     if ($method === "GET" && $path === "hospitals") {
-        $stmt = $pdo->query("SELECT h.id, u.name, h.location, h.province, h.city, u.status FROM hospitals h JOIN users u ON h.user_id = u.id");
+        $stmt = $pdo->query("SELECT h.id, u.name, h.location, h.province, h.city, u.status, u.is_verified FROM hospitals h JOIN users u ON h.user_id = u.id");
         echo json_encode($stmt->fetchAll());
         exit;
     }

@@ -41,6 +41,11 @@ include '../includes/layout/header.php';
 
     <!-- Main Content -->
     <main class="main-content">
+        <?php
+        $stmtSA = $pdo->prepare("SELECT is_verified FROM users WHERE id = ?");
+        $stmtSA->execute([$_SESSION['user_id']]);
+        $_SESSION['is_verified'] = $stmtSA->fetchColumn();
+        ?>
         <header class="top-bar">
             <div class="search-box">
                 <i class="fas fa-search"></i>
@@ -52,6 +57,18 @@ include '../includes/layout/header.php';
                     class="avatar">
             </div>
         </header>
+        
+        <?php if (isset($_SESSION['is_verified']) && $_SESSION['is_verified'] == 0): ?>
+            <div class="verification-banner" style="background: #fff3cd; color: #856404; padding: 15px 25px; margin: 20px; border-radius: 10px; border-left: 5px solid #ffeeba; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
+                <div style="display: flex; align-items: center; gap: 15px;">
+                    <i class="fas fa-exclamation-triangle" style="font-size: 1.2rem;"></i>
+                    <span><strong>Verify your email!</strong> Please check your inbox to confirm your email address. Some features may be restricted until verified.</span>
+                </div>
+                <form action="../resend_verification.php" method="POST" style="margin: 0;">
+                    <button type="submit" style="background: #856404; color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; font-weight: 600; transition: all 0.3s ease;">Resend Email</button>
+                </form>
+            </div>
+        <?php endif; ?>
 
         <!-- DASHBOARD PAGE -->
         <section id="dashboard" class="page-section active">
@@ -100,10 +117,7 @@ include '../includes/layout/header.php';
                         </div>
                         <div class="input-field-modern">
                             <label>Password</label>
-                            <div style="position: relative; display: flex; align-items: center;">
-                                <input type="password" name="password" required style="width: 100%; padding-right: 40px;">
-                                <i class="fas fa-eye toggle-password" style="position: absolute; right: 15px; cursor: pointer; color: var(--admin-text-light);" title="Toggle password visibility"></i>
-                            </div>
+                            <input type="password" name="password" required>
                         </div>
                         <div class="input-field-modern">
                             <label>Phone Number</label>
@@ -113,7 +127,8 @@ include '../includes/layout/header.php';
                         <div style="display:flex; gap:10px; margin-bottom:15px;">
                             <div class="input-field-modern" style="flex:1; margin-bottom:0;">
                                 <label>Province</label>
-                                <select name="province" id="sa-province" required onchange="updateSACities()" style="width:100%;">
+                                <select name="province" id="sa-province" required onchange="updateSACities()"
+                                    style="width:100%;">
                                     <option value="" disabled selected>Select Province</option>
                                     <option value="Koshi">Koshi</option>
                                     <option value="Madhesh">Madhesh</option>

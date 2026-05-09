@@ -77,18 +77,20 @@ require_once 'includes/layout/header.php';
             <form action="reset_password.php" method="POST">
                 <input type="hidden" name="token" value="<?php echo htmlspecialchars($token); ?>" />
 
-                <div class="input-field">
+                <div class="input-field password-field">
                     <i class="fas fa-lock"></i>
                     <input type="password" name="password" placeholder="New Password" 
                         required 
                         pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$"
                         title="At least 8 characters, with uppercase, lowercase, number and special char" />
+                    <i class="fas fa-eye toggle-password" title="Toggle password visibility"></i>
                 </div>
-                <div class="input-field">
+                <div class="input-field password-field">
                     <i class="fas fa-lock"></i>
                     <input type="password" name="confirm_password" placeholder="Confirm New Password" 
                         required 
                         pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$" />
+                    <i class="fas fa-eye toggle-password" title="Toggle password visibility"></i>
                 </div>
                 <p style="font-size: 0.72rem; color: var(--text-muted); margin: -10px 0 15px 5px; line-height: 1.2;">
                     <i class="fas fa-info-circle"></i> 8+ chars: A-Z, a-z, 0-9 & symbols.

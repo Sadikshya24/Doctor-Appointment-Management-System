@@ -139,7 +139,12 @@ function renderTable(data) {
                 
             table.innerHTML += `
                 <tr>
-                    <td>${h.name}</td>
+                    <td>
+                        ${h.name}
+                        ${h.is_verified == 1 
+                            ? '<i class="fas fa-check-circle" style="color:#2ecc71; font-size:0.8em;" title="Verified"></i>' 
+                            : '<i class="fas fa-times-circle" style="color:#e74c3c; font-size:0.8em;" title="Unverified"></i>'}
+                    </td>
                     <td>${fullLocation}</td>
                     <td><span class="${statusClass}">${h.status.toUpperCase()}</span></td>
                     <td>

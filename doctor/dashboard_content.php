@@ -165,7 +165,13 @@ $report_times = $check_reports->fetchAll(PDO::FETCH_KEY_PAIR);
                         value="<?php echo htmlspecialchars($_SESSION['name']); ?>" required>
                 </div>
                 <div class="dd-group">
-                    <label>Email Address</label>
+                    <label>Email Address 
+                        <?php if (isset($_SESSION['is_verified']) && $_SESSION['is_verified'] == 1): ?>
+                            <span class="badge" style="background: #2ecc71; color: white; padding: 2px 8px; border-radius: 12px; font-size: 0.75em; margin-left: 5px; vertical-align: middle;"><i class="fas fa-check-circle"></i> Verified</span>
+                        <?php else: ?>
+                            <span class="badge" style="background: #e74c3c; color: white; padding: 2px 8px; border-radius: 12px; font-size: 0.75em; margin-left: 5px; vertical-align: middle;"><i class="fas fa-times-circle"></i> Unverified</span>
+                        <?php endif; ?>
+                    </label>
                     <input type="email" name="email" class="dd-input"
                         value="<?php echo htmlspecialchars($_SESSION['email']); ?>"
                         pattern="[a-zA-Z0-9]+@(gmail\.com|outlook\.com|yahoo\.com|hotmail\.com|yopmail\.com)"

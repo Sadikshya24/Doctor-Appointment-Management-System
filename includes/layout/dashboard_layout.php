@@ -85,6 +85,18 @@ function renderDashboardLayout($role, $userName, $userPhoto, $menuItems, $conten
                 </div>
             </header>
 
+            <?php if (isset($_SESSION['is_verified']) && $_SESSION['is_verified'] == 0): ?>
+                <div class="verification-banner" style="background: #fff3cd; color: #856404; padding: 15px 25px; margin: 20px; border-radius: 10px; border-left: 5px solid #ffeeba; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
+                    <div style="display: flex; align-items: center; gap: 15px;">
+                        <i class="fas fa-exclamation-triangle" style="font-size: 1.2rem;"></i>
+                        <span><strong>Verify your email!</strong> Please check your inbox to confirm your email address. Some features may be restricted until verified.</span>
+                    </div>
+                    <form action="<?php echo $basePath; ?>resend_verification.php" method="POST" style="margin: 0;">
+                        <button type="submit" style="background: #856404; color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; font-weight: 600; transition: all 0.3s ease;">Resend Email</button>
+                    </form>
+                </div>
+            <?php endif; ?>
+
             <div class="dashboard-content-area">
                 <?php include $contentFile; ?>
             </div>
