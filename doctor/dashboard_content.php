@@ -122,6 +122,48 @@ $report_times = $check_reports->fetchAll(PDO::FETCH_KEY_PAIR);
         </div>
     </div>
 
+    <!-- AI Insights Tab -->
+    <div id="tab-ai_insights" class="dd-content">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:25px;">
+            <div>
+                <h2 style="margin:0;"><i class="fas fa-brain" style="color: #6366f1;"></i> AI Clinical Analytics</h2>
+                <p style="color: #64748b; margin-top: 5px;">Predictive forecasting and patient follow-up
+                    recommendations.</p>
+            </div>
+            <button class="dd-btn" onclick="loadAiInsights()"><i class="fas fa-sync"></i> Refresh Data</button>
+        </div>
+
+        <div class="dd-grid" style="grid-template-columns: 1.5fr 1fr; gap: 25px;">
+            <!-- Forecasting Section -->
+            <div class="dd-card" style="padding: 25px;">
+                <h4 style="margin-bottom: 20px;"><i class="fas fa-chart-line"></i> 7-Day Patient Load Forecast</h4>
+                <div id="forecast-container"
+                    style="height: 250px; display: flex; align-items: flex-end; justify-content: space-between; padding-top: 20px; border-bottom: 2px solid #e2e8f0; margin-bottom: 15px;">
+                    <!-- Loaded via JS -->
+                </div>
+                <div id="forecast-labels"
+                    style="display: flex; justify-content: space-between; color: #64748b; font-size: 0.8em; font-weight: 600;">
+                    <!-- Loaded via JS -->
+                </div>
+                <div
+                    style="margin-top: 20px; padding: 15px; background: #f0f9ff; border-radius: 8px; border-left: 4px solid #0ea5e9;">
+                    <p style="font-size: 0.9em; color: #0c4a6e; margin: 0;">
+                        <i class="fas fa-info-circle"></i> <b>AI Insight:</b> Forecast is based on your historical
+                        booking trends over the last 60 days.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Recommendations Section -->
+            <div class="dd-card" style="padding: 25px;">
+                <h4 style="margin-bottom: 20px;"><i class="fas fa-lightbulb"></i> Clinical Suggestions</h4>
+                <div id="ai-recommendations-list" style="display: flex; flex-direction: column; gap: 15px;">
+                    <!-- Loaded via JS -->
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Active Bookings Tab -->
     <div id="tab-bookings" class="dd-content">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
@@ -165,11 +207,15 @@ $report_times = $check_reports->fetchAll(PDO::FETCH_KEY_PAIR);
                         value="<?php echo htmlspecialchars($_SESSION['name']); ?>" required>
                 </div>
                 <div class="dd-group">
-                    <label>Email Address 
+                    <label>Email Address
                         <?php if (isset($_SESSION['is_verified']) && $_SESSION['is_verified'] == 1): ?>
-                            <span class="badge" style="background: #2ecc71; color: white; padding: 2px 8px; border-radius: 12px; font-size: 0.75em; margin-left: 5px; vertical-align: middle;"><i class="fas fa-check-circle"></i> Verified</span>
+                            <span class="badge"
+                                style="background: #2ecc71; color: white; padding: 2px 8px; border-radius: 12px; font-size: 0.75em; margin-left: 5px; vertical-align: middle;"><i
+                                    class="fas fa-check-circle"></i> Verified</span>
                         <?php else: ?>
-                            <span class="badge" style="background: #e74c3c; color: white; padding: 2px 8px; border-radius: 12px; font-size: 0.75em; margin-left: 5px; vertical-align: middle;"><i class="fas fa-times-circle"></i> Unverified</span>
+                            <span class="badge"
+                                style="background: #e74c3c; color: white; padding: 2px 8px; border-radius: 12px; font-size: 0.75em; margin-left: 5px; vertical-align: middle;"><i
+                                    class="fas fa-times-circle"></i> Unverified</span>
                         <?php endif; ?>
                     </label>
                     <input type="email" name="email" class="dd-input"
@@ -249,23 +295,30 @@ $report_times = $check_reports->fetchAll(PDO::FETCH_KEY_PAIR);
 
     <!-- Patient Search Tab -->
     <div id="tab-search" class="dd-content">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; border-bottom: 2px solid #f1f5f9; padding-bottom: 15px;">
+        <div
+            style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; border-bottom: 2px solid #f1f5f9; padding-bottom: 15px;">
             <h2 style="margin:0;"><i class="fas fa-search"></i> Patient Search</h2>
-            <p style="color: #64748b; font-size: 0.9em; margin: 0;">Lookup MedScape patient history by ID or Name. <span style="color:var(--primary); font-weight:600;">(Filtered to your hospital)</span></p>
+            <p style="color: #64748b; font-size: 0.9em; margin: 0;">Lookup MedScape patient history by ID or Name. <span
+                    style="color:var(--primary); font-weight:600;">(Filtered to your hospital)</span></p>
         </div>
-        
+
         <div class="dd-card" style="margin-bottom: 25px; padding: 25px; background: #fff;">
             <div style="display: flex; gap: 12px; margin-bottom: 0;">
                 <div style="flex: 1; position: relative;">
-                    <i class="fas fa-id-card" style="position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: #94a3b8;"></i>
-                    <input type="text" id="patient-search-input" class="dd-input" style="width: 100%; padding-left: 45px;" placeholder="Search Patient ID or Name..." onkeyup="handlePatientSearch(event)">
+                    <i class="fas fa-id-card"
+                        style="position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: #94a3b8;"></i>
+                    <input type="text" id="patient-search-input" class="dd-input"
+                        style="width: 100%; padding-left: 45px;" placeholder="Search Patient ID or Name..."
+                        onkeyup="handlePatientSearch(event)">
                 </div>
-                <button class="dd-btn" onclick="performPatientSearch()" style="padding: 0 30px;"><i class="fas fa-search"></i> Search</button>
+                <button class="dd-btn" onclick="performPatientSearch()" style="padding: 0 30px;"><i
+                        class="fas fa-search"></i> Search</button>
             </div>
         </div>
 
         <div id="patient-search-results" class="dd-grid">
-            <div style="text-align:center; padding: 50px; color:#94a3b8; grid-column: 1/-1; background:#f8fafc; border-radius:12px; border: 2px dashed #e2e8f0;">
+            <div
+                style="text-align:center; padding: 50px; color:#94a3b8; grid-column: 1/-1; background:#f8fafc; border-radius:12px; border: 2px dashed #e2e8f0;">
                 <i class="fas fa-user-injured" style="font-size:3em; margin-bottom:15px; opacity: 0.5;"></i><br>
                 Enter a Patient ID or Name to begin clinical review.
             </div>
@@ -283,7 +336,7 @@ $report_times = $check_reports->fetchAll(PDO::FETCH_KEY_PAIR);
             <input type="hidden" id="report-appt-id">
             <input type="hidden" id="report-pat-id">
             <input type="hidden" id="report-id"> <!-- Added for editing -->
-            
+
             <div class="dd-group">
                 <label>Patient Details</label>
                 <input type="text" id="report-pat-name" class="dd-input" disabled>
@@ -312,14 +365,16 @@ $report_times = $check_reports->fetchAll(PDO::FETCH_KEY_PAIR);
                 <textarea id="report-prescription" class="dd-input" rows="4" required
                     placeholder="Medications, dosage, and frequency..."></textarea>
             </div>
-            
+
             <div style="margin-top: 15px; border-top: 1px solid #ddd; padding-top: 15px;">
-                <button type="button" class="dd-btn" style="width:100%; background: #f1f5f9; color: #475569;" onclick="openPatientHistory(document.getElementById('report-pat-id').value, document.getElementById('report-pat-name').value)">
+                <button type="button" class="dd-btn" style="width:100%; background: #f1f5f9; color: #475569;"
+                    onclick="openPatientHistory(document.getElementById('report-pat-id').value, document.getElementById('report-pat-name').value)">
                     <i class="fas fa-history"></i> Check Full Medical History
                 </button>
             </div>
 
-            <button type="submit" id="report-submit-btn" class="dd-btn dd-btn-success" style="width:100%; margin-top: 15px;">Save Report & Mark Completed</button>
+            <button type="submit" id="report-submit-btn" class="dd-btn dd-btn-success"
+                style="width:100%; margin-top: 15px;">Save Report & Mark Completed</button>
         </form>
     </div>
 </div>
@@ -327,9 +382,12 @@ $report_times = $check_reports->fetchAll(PDO::FETCH_KEY_PAIR);
 <!-- Patient History Modal (Cross-Doctor Clinical Records) -->
 <div id="patient-history-modal" class="dd-modal-overlay">
     <div class="dd-modal" style="max-width: 700px; max-height: 85vh; overflow-y: auto;">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; border-bottom:1px solid #eee; padding-bottom:10px;">
+        <div
+            style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; border-bottom:1px solid #eee; padding-bottom:10px;">
             <h3 style="margin:0;"><i class="fas fa-file-medical-alt"></i> Complete Clinical History</h3>
-            <button class="dd-close" onclick="document.getElementById('patient-history-modal').classList.remove('active')" style="background:none; border:none; font-size:1.5em; cursor:pointer;">&times;</button>
+            <button class="dd-close"
+                onclick="document.getElementById('patient-history-modal').classList.remove('active')"
+                style="background:none; border:none; font-size:1.5em; cursor:pointer;">&times;</button>
         </div>
         <h4 id="ph-modal-patient-name" style="margin-top:0; color:var(--primary);"></h4>
         <div id="patient-history-content">
@@ -341,9 +399,11 @@ $report_times = $check_reports->fetchAll(PDO::FETCH_KEY_PAIR);
 <!-- History Modal -->
 <div id="history-modal" class="dd-modal-overlay">
     <div class="dd-modal" style="max-width: 600px; max-height: 85vh; overflow-y: auto;">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; border-bottom:1px solid #eee; padding-bottom:10px;">
+        <div
+            style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; border-bottom:1px solid #eee; padding-bottom:10px;">
             <h3 style="margin:0;"><i class="fas fa-history"></i> Report History</h3>
-            <button class="dd-close" onclick="document.getElementById('history-modal').classList.remove('active')" style="background:none; border:none; font-size:1.5em; cursor:pointer;">&times;</button>
+            <button class="dd-close" onclick="document.getElementById('history-modal').classList.remove('active')"
+                style="background:none; border:none; font-size:1.5em; cursor:pointer;">&times;</button>
         </div>
         <div id="history-list">
             <!-- Loaded via JS -->
@@ -412,6 +472,7 @@ $report_times = $check_reports->fetchAll(PDO::FETCH_KEY_PAIR);
         if (targetTab) targetTab.classList.add('active');
 
         if (tabId === 'overview') loadDocStats();
+        if (tabId === 'ai_insights') loadAiInsights();
         if (tabId === 'bookings') loadDocAppointments('bookings-list', 'scheduled');
         if (tabId === 'consulted') loadDocAppointments('consulted-list', 'completed');
     }
@@ -576,7 +637,8 @@ $report_times = $check_reports->fetchAll(PDO::FETCH_KEY_PAIR);
                     </div>
                 `}
             </div>
-        `; }).join('');
+        `;
+            }).join('');
         } catch (err) { console.error('Error fetching appointments:', err); }
     }
 
@@ -666,7 +728,7 @@ $report_times = $check_reports->fetchAll(PDO::FETCH_KEY_PAIR);
         document.getElementById('report-diagnosis').value = '';
         document.getElementById('report-details').value = '';
         document.getElementById('report-prescription').value = '';
-        
+
         document.getElementById('report-modal-title').textContent = 'Add Note / Prescription';
         document.getElementById('report-submit-btn').textContent = 'Save Report & Mark Completed';
         document.getElementById('report-modal').classList.add('active');
@@ -699,7 +761,7 @@ $report_times = $check_reports->fetchAll(PDO::FETCH_KEY_PAIR);
             const res = await fetch(`../logic/doctor/actions.php?action=get_report_history&report_id=${reportId}`);
             const history = await res.json();
             if (!history || !history[0]) return;
-            
+
             const latest = history[0];
             document.getElementById('report-appt-id').value = '';
             document.getElementById('report-pat-id').value = latest.patient_id;
@@ -751,7 +813,7 @@ $report_times = $check_reports->fetchAll(PDO::FETCH_KEY_PAIR);
         e.preventDefault();
         const reportId = document.getElementById('report-id').value;
         const action = reportId ? 'edit_report' : 'add_report';
-        
+
         const formData = new FormData();
         if (reportId) formData.append('report_id', reportId);
         formData.append('appointment_id', document.getElementById('report-appt-id').value);
@@ -798,14 +860,109 @@ $report_times = $check_reports->fetchAll(PDO::FETCH_KEY_PAIR);
         try {
             const res = await fetch('../logic/doctor/actions.php?action=update_profile', { method: 'POST', body: formData });
             const result = await res.json();
-            if (result.status === 'success') {
-                showToast(result.message, 'success');
-            } else {
-                showToast(result.message || 'Update failed', 'error');
-            }
-        } catch (e) { showToast("An error occurred", 'error'); }
+            showToast(result.message, result.status === 'success' ? 'success' : 'error');
+        } catch (e) { showToast("Error updating profile", 'error'); }
     }
 
+    async function loadAiInsights() {
+        const forecastContainer = document.getElementById('forecast-container');
+        const forecastLabels = document.getElementById('forecast-labels');
+        const recList = document.getElementById('ai-recommendations-list');
+
+        if (!forecastContainer || !recList) return;
+
+        forecastContainer.innerHTML = '<p style="margin: auto; color: #94a3b8;">Analyzing trends...</p>';
+        recList.innerHTML = '<p style="text-align: center; color: #94a3b8; padding: 20px;">Scanning records...</p>';
+
+        try {
+            const res = await fetch('../logic/doctor/actions.php?action=get_ai_insights');
+            const data = await res.json();
+
+            // Render Forecast
+            if (data.forecast && data.forecast.length > 0) {
+                const maxLoad = Math.max(...data.forecast.map(f => f.predicted_load), 5);
+
+                forecastContainer.innerHTML = data.forecast.map(f => {
+                    const height = (f.predicted_load / maxLoad) * 100;
+                    const isToday = new Date(f.date).toDateString() === new Date().toDateString();
+                    return `
+                        <div style="flex: 1; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: flex-end;">
+                            <div style="width: 35px; height: ${height}%; background: linear-gradient(180deg, #6366f1 0%, #3b82f6 100%); border-radius: 6px 6px 0 0; transition: all 0.5s ease; position: relative; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); border: ${isToday ? '2px solid #1e293b' : 'none'};" title="${f.predicted_load} patients predicted">
+                                <span style="position: absolute; top: -25px; left: 50%; transform: translateX(-50%); font-size: 0.75em; font-weight: 700; color: #475569;">${f.predicted_load}</span>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+
+                forecastLabels.innerHTML = data.forecast.map(f => {
+                    const isToday = new Date(f.date).toDateString() === new Date().toDateString();
+                    return `<div style="flex: 1; text-align: center; ${isToday ? 'color: #6366f1; font-weight: 700;' : ''}">${f.day.slice(0, 3).toUpperCase()}</div>`;
+                }).join('');
+            }
+
+            // Render Recommendations
+            if (data.recommendations && data.recommendations.length > 0) {
+                recList.innerHTML = data.recommendations.map(r => `
+                    <div class="dd-card" style="padding: 15px; border-left: 4px solid #6366f1; background: #f8fafc; position: relative;">
+                        <h5 style="margin: 0 0 8px 0; color: #1e293b; padding-right: 20px;">${r.title}</h5>
+                        <p style="font-size: 0.85em; color: #64748b; line-height: 1.4; margin: 0 0 12px 0;">${r.description}</p>
+                        <div style="display: flex; gap: 8px;">
+                            <button class="dd-btn" style="padding: 6px 12px; font-size: 0.8em; flex: 1;" onclick="handleRecommendation(${r.id}, 'accepted', ${r.patient_id}, '${escapeQuotes(r.title)}')">
+                                <i class="fas fa-check"></i> Action
+                            </button>
+                            <button class="dd-btn" style="padding: 6px 12px; font-size: 0.8em; background: transparent; border: 1px solid #cbd5e1; color: #64748b;" onclick="handleRecommendation(${r.id}, 'ignored')">
+                                Ignore
+                            </button>
+                        </div>
+                        <i class="fas fa-times" style="position: absolute; top: 12px; right: 12px; color: #94a3b8; cursor: pointer; font-size: 0.9em;" onclick="handleRecommendation(${r.id}, 'dismissed')" title="Dismiss"></i>
+                    </div>
+                `).join('');
+            } else {
+                recList.innerHTML = `
+                    <div style="text-align: center; padding: 40px 20px; color: #94a3b8;">
+                        <i class="fas fa-check-circle" style="font-size: 2em; color: #22c55e; opacity: 0.5; margin-bottom: 10px;"></i>
+                        <p style="font-size: 0.9em; margin: 0;">AI engine reports no urgent recommendations at this time.</p>
+                    </div>
+                `;
+            }
+
+        } catch (e) {
+            console.error(e);
+            forecastContainer.innerHTML = '<p style="margin: auto; color: #ef4444;">Failed to load analytics</p>';
+        }
+    }
+
+    async function handleRecommendation(id, status, patientId = null, title = '') {
+        const fd = new FormData();
+        fd.append('id', id);
+        fd.append('status', status);
+
+        try {
+            const res = await fetch('../logic/doctor/actions.php?action=update_ai_recommendation', { method: 'POST', body: fd });
+            const result = await res.json();
+
+            if (result.status === 'success') {
+                if (status === 'accepted' && patientId) {
+                    // If accepted, maybe open patient search or something?
+                    // For now, let's just show a toast and refresh
+                    showToast("Insight accepted. Opening patient profile...", 'info');
+                    performPatientSearchWithId(patientId);
+                } else {
+                    showToast(result.message, 'success');
+                }
+                loadAiInsights();
+            }
+        } catch (e) { console.error(e); }
+    }
+
+    function performPatientSearchWithId(id) {
+        switchTab(null, 'search');
+        const input = document.getElementById('patient-search-input');
+        if (input) {
+            input.value = id;
+            performPatientSearch();
+        }
+    }
     // Initial Load
     if (document.getElementById('tab-overview')) {
         loadDocStats();
@@ -819,7 +976,7 @@ $report_times = $check_reports->fetchAll(PDO::FETCH_KEY_PAIR);
     async function performPatientSearch() {
         const query = document.getElementById('patient-search-input').value;
         const container = document.getElementById('patient-search-results');
-        
+
         if (!query.trim()) {
             showToast("Please enter an ID or Name", 'error');
             return;
@@ -855,7 +1012,7 @@ $report_times = $check_reports->fetchAll(PDO::FETCH_KEY_PAIR);
 
     async function openPatientHistory(patientId, patientName) {
         if (!patientId) return;
-        
+
         const container = document.getElementById('patient-history-content');
         document.getElementById('ph-modal-patient-name').textContent = "Patient: " + patientName;
         container.innerHTML = '<p style="text-align:center; padding:30px;">Accessing medical records portal...</p>';
