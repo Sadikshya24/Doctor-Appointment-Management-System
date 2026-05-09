@@ -28,14 +28,30 @@ require_once '../includes/layout/header.php';
 <body>
 
     <div class="dashboard-container">
-        <div class="header">
-            <h1>MedScape</h1>
-            <div class="header-actions">
-                <?php if ($_SESSION['role'] !== 'superadmin'): ?>
-                    <img src="../<?php echo htmlspecialchars($userPhoto); ?>" alt="Profile" class="header-profile-img"
+        <div class="top-bar">
+            <div class="user-profile-wrapper">
+                <div class="user-profile" id="profileToggle">
+                    <span class="user-name"><?php echo $userName; ?></span>
+                    <img src="../<?php echo htmlspecialchars($userPhoto); ?>" alt="Profile" class="avatar"
                         onerror="this.src='../assets/img/default.jpeg'">
-                <?php endif; ?>
-                <a href="../logic/auth/logout.php" class="btn-logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                    <i class="fas fa-chevron-down dropdown-icon"></i>
+                </div>
+                <div class="profile-dropdown" id="profileDropdown">
+                    <div class="dropdown-header" style="padding: 10px 14px; border-bottom: 1px solid var(--border-color); margin-bottom: 5px;">
+                        <div style="font-weight: 700; color: var(--text-main); font-size: 0.9rem;"><?php echo $userName; ?></div>
+                        <div style="color: var(--text-muted); font-size: 0.8rem;">Superadmin</div>
+                    </div>
+                    <a href="#" onclick="showToast('Profile editing coming soon for admin', 'info'); return false;">
+                        <i class="fas fa-user-circle"></i> Edit Profile
+                    </a>
+                    <a href="../reset_password.php">
+                        <i class="fas fa-key"></i> Change Password
+                    </a>
+                    <div class="dropdown-divider"></div>
+                    <a href="../logic/auth/logout.php" class="logout-link">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </a>
+                </div>
             </div>
         </div>
 

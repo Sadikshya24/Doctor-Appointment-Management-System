@@ -78,10 +78,32 @@ function renderDashboardLayout($role, $userName, $userPhoto, $menuItems, $conten
         <!-- Main Content -->
         <main class="main-content">
             <header class="top-bar">
-                <div class="user-profile">
-                    <span class="user-name"><?php echo htmlspecialchars($userName); ?></span>
-                    <img src="<?php echo $basePath . ($userPhoto ?: 'assets/img/default.jpeg'); ?>" alt="Profile"
-                        class="avatar" onerror="this.src='<?php echo $basePath; ?>assets/img/default.jpeg'">
+                <div class="user-profile-wrapper">
+                    <div class="user-profile" id="profileToggle">
+                        <span class="user-name"><?php echo htmlspecialchars($userName); ?></span>
+                        <img src="<?php echo $basePath . ($userPhoto ?: 'assets/img/default.jpeg'); ?>" alt="Profile"
+                            class="avatar" onerror="this.src='<?php echo $basePath; ?>assets/img/default.jpeg'">
+                        <i class="fas fa-chevron-down dropdown-icon"></i>
+                    </div>
+                    <div class="profile-dropdown" id="profileDropdown">
+                        <div class="dropdown-header" style="padding: 10px 14px; border-bottom: 1px solid var(--border-color); margin-bottom: 5px;">
+                            <div style="font-weight: 700; color: var(--text-main); font-size: 0.9rem;"><?php echo htmlspecialchars($userName); ?></div>
+                            <div style="color: var(--text-muted); font-size: 0.8rem;"><?php echo ucfirst($role); ?></div>
+                        </div>
+                        <?php 
+                            $profileTab = ($role === 'doctor') ? 'settings' : 'profile';
+                        ?>
+                        <a href="#" onclick="switchTab(event, '<?php echo $profileTab; ?>'); return false;">
+                            <i class="fas fa-user-circle"></i> Edit Profile
+                        </a>
+                        <a href="<?php echo $basePath; ?>reset_password.php">
+                            <i class="fas fa-key"></i> Change Password
+                        </a>
+                        <div class="dropdown-divider"></div>
+                        <a href="<?php echo $basePath; ?>logic/auth/logout.php" class="logout-link">
+                            <i class="fas fa-sign-out-alt"></i> Logout
+                        </a>
+                    </div>
                 </div>
             </header>
 
