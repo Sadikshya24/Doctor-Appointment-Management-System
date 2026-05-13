@@ -1,5 +1,5 @@
 <?php
-require_once 'includes/db.php';
+require_once 'includes/core/db.php';
 
 // Fetch stats
 $stats = [
@@ -22,11 +22,12 @@ try {
 }
 
 $pageTitle = 'MedScape - Home';
-require_once 'includes/header.php';
+require_once 'includes/layout/header.php';
 ?>
 
+<link rel="stylesheet" href="assets/css/dashboard_wrapper.css">
 <style>
-    /* Premium Landing Page Styles */
+    /* Landing Page Harmonization */
     body {
         background-color: var(--bg-body);
         margin: 0;
@@ -37,12 +38,12 @@ require_once 'includes/header.php';
     .landing-hero {
         position: relative;
         text-align: center;
-        padding: 100px 20px 80px;
-        background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+        padding: 120px 20px 100px;
+        background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-hover) 100%);
         color: white;
         border-radius: 0 0 40px 40px;
-        margin-bottom: 50px;
-        box-shadow: 0 15px 40px rgba(59, 130, 246, 0.15);
+        margin-bottom: 60px;
+        box-shadow: var(--shadow-lg);
         overflow: hidden;
     }
 
@@ -53,131 +54,122 @@ require_once 'includes/header.php';
         left: -50%;
         width: 200%;
         height: 200%;
-        background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 60%);
-        opacity: 0.5;
+        background: radial-gradient(circle, rgba(255, 255, 255, 0.15) 0%, transparent 60%);
+        opacity: 0.6;
         pointer-events: none;
     }
 
     .landing-hero h1 {
-        font-size: 3.5rem;
-        margin-bottom: 20px;
-        font-weight: 700;
-        letter-spacing: -1px;
+        font-size: 3.8rem;
+        margin-bottom: 24px;
+        font-weight: 800;
+        letter-spacing: -1.5px;
         position: relative;
         z-index: 2;
-        text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
     }
 
     .landing-hero p {
-        font-size: 1.25rem;
-        max-width: 650px;
-        margin: 0 auto 40px;
-        opacity: 0.95;
-        line-height: 1.6;
+        font-size: 1.3rem;
+        max-width: 700px;
+        margin: 0 auto 48px;
+        opacity: 0.9;
+        line-height: 1.7;
         position: relative;
         z-index: 2;
     }
 
     .btn-hero {
         display: inline-block;
-        background-color: white;
-        color: #1e3a8a;
-        padding: 16px 45px;
+        background-color: var(--text-white);
+        color: var(--primary-color);
+        padding: 18px 50px;
         border-radius: 50px;
-        font-weight: 600;
-        font-size: 1.15rem;
+        font-weight: 700;
+        font-size: 1.2rem;
         text-decoration: none;
-        transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
         position: relative;
         z-index: 2;
     }
 
     .btn-hero:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-        background-color: #f8fafc;
+        transform: translateY(-4px) scale(1.02);
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+        color: var(--primary-hover);
     }
 
     .top-nav {
         position: absolute;
-        top: 25px;
+        top: 30px;
         right: 40px;
         z-index: 10;
     }
 
     .btn-login {
-        background: rgba(255, 255, 255, 0.15);
+        background: rgba(255, 255, 255, 0.1);
         backdrop-filter: blur(10px);
         color: white;
-        padding: 10px 25px;
+        padding: 12px 28px;
         border-radius: 50px;
         text-decoration: none;
         font-weight: 600;
-        border: 1px solid rgba(255, 255, 255, 0.3);
-        transition: all 0.3s;
+        border: 1.5px solid rgba(255, 255, 255, 0.2);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         display: flex;
         align-items: center;
-        gap: 8px;
+        gap: 10px;
     }
 
     .btn-login:hover {
         background: white;
-        color: #1e3a8a;
+        color: var(--primary-color);
+        transform: translateY(-2px);
     }
 
     .stats-container {
         display: flex;
         justify-content: center;
-        gap: 30px;
+        gap: 32px;
         padding: 0 20px 80px;
         flex-wrap: wrap;
-        max-width: 1200px;
+        max-width: 1240px;
         margin: 0 auto;
     }
 
     .stat-card {
         background: var(--bg-card);
-        border-radius: 20px;
-        padding: 50px 30px;
+        border-radius: 24px;
+        padding: 48px 32px;
         text-align: center;
         flex: 1;
-        min-width: 250px;
-        box-shadow: var(--shadow);
-        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        min-width: 280px;
+        box-shadow: var(--shadow-md);
+        transition: all 0.4s ease;
         border: 1px solid var(--border-color);
         position: relative;
         overflow: hidden;
     }
 
-    .stat-card::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 5px;
-        background: linear-gradient(90deg, #3b82f6, #60a5fa);
-    }
-
     .stat-card:hover {
-        transform: translateY(-10px);
-        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.1);
+        transform: translateY(-12px);
+        box-shadow: var(--shadow-lg);
+        border-color: var(--primary-color);
     }
 
     .stat-card i {
         font-size: 3.5rem;
-        background: -webkit-linear-gradient(45deg, #1e3a8a, #3b82f6);
+        background: -webkit-linear-gradient(45deg, var(--primary-color), #818cf8);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
-        margin-bottom: 25px;
+        margin-bottom: 24px;
         display: inline-block;
     }
 
     .stat-card h3 {
-        font-size: 3.5rem;
+        font-size: 3.2rem;
         color: var(--text-main);
-        margin-bottom: 5px;
+        margin: 0 0 8px;
         font-weight: 800;
         letter-spacing: -1px;
     }
@@ -187,20 +179,21 @@ require_once 'includes/header.php';
         font-weight: 600;
         font-size: 1.1rem;
         text-transform: uppercase;
-        letter-spacing: 1.5px;
+        letter-spacing: 2px;
+        margin: 0;
     }
 
     .features-section {
-        padding: 80px 20px;
+        padding: 100px 24px;
         background-color: var(--bg-body);
         text-align: center;
     }
 
     .features-section h2 {
-        font-size: 2.5rem;
+        font-size: 2.8rem;
         color: var(--text-main);
-        margin-bottom: 50px;
-        font-weight: 700;
+        margin-bottom: 64px;
+        font-weight: 800;
         position: relative;
         display: inline-block;
     }
@@ -211,63 +204,70 @@ require_once 'includes/header.php';
         bottom: -15px;
         left: 50%;
         transform: translateX(-50%);
-        width: 60px;
-        height: 4px;
-        background-color: #3b82f6;
-        border-radius: 2px;
+        width: 80px;
+        height: 6px;
+        background: linear-gradient(90deg, var(--primary-color), #818cf8);
+        border-radius: 3px;
     }
 
     .features-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-        gap: 40px;
-        max-width: 1200px;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 32px;
+        max-width: 1240px;
         margin: 0 auto;
     }
 
     .feature-item {
-        padding: 30px;
-        border-radius: 16px;
+        padding: 40px;
+        border-radius: 24px;
         background-color: var(--bg-card);
-        transition: transform 0.3s, box-shadow 0.3s;
+        transition: all 0.3s ease;
         border: 1px solid var(--border-color);
+        box-shadow: var(--shadow-sm);
+        text-align: left;
     }
 
     .feature-item:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.05);
-        border-color: #bfdbfe;
+        transform: translateY(-8px);
+        box-shadow: var(--shadow-md);
+        border-color: var(--primary-color);
     }
 
     .feature-icon {
-        width: 70px;
-        height: 70px;
-        background-color: var(--input-bg);
-        border-radius: 50%;
+        width: 64px;
+        height: 64px;
+        background-color: var(--primary-light);
+        border-radius: 16px;
         display: flex;
         align-items: center;
         justify-content: center;
-        margin: 0 auto 20px;
+        margin-bottom: 24px;
         color: var(--primary-color);
-        font-size: 2rem;
+        font-size: 1.8rem;
     }
 
     .feature-item h3 {
         font-size: 1.5rem;
         color: var(--text-main);
-        margin-bottom: 15px;
+        margin-bottom: 16px;
         font-weight: 700;
     }
 
     .feature-item p {
         color: var(--text-muted);
-        line-height: 1.6;
-        font-size: 1.05rem;
+        line-height: 1.7;
+        font-size: 1.1rem;
+        margin: 0;
     }
 
     @media (max-width: 768px) {
         .landing-hero h1 {
-            font-size: 2.5rem;
+            font-size: 2.8rem;
+        }
+
+        .landing-hero p {
+            font-size: 1.1rem;
         }
 
         .top-nav {
@@ -276,7 +276,7 @@ require_once 'includes/header.php';
         }
 
         .stat-card {
-            padding: 40px 20px;
+            padding: 40px 24px;
         }
 
         .stat-card h3 {
@@ -350,4 +350,4 @@ require_once 'includes/header.php';
     </div>
 </div>
 
-<?php require_once 'includes/footer.php'; ?>
+<?php require_once 'includes/layout/footer.php'; ?>
