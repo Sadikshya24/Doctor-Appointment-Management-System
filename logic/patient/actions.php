@@ -130,8 +130,7 @@ try {
 
         $booking_id = 'BK-' . strtoupper(substr(uniqid(), -6)) . '-' . rand(100, 999);
 
-        $stmt = $pdo->prepare("INSERT INTO appointments (booking_id, patient_id, doctor_id, hospital_id, appointment_date, appointment_time, reason, status, payment_status) VALUES (?, ?, ?, ?, ?, ?, ?, 'pending_payment', 'pending')");
-        try {
+            $stmt = $pdo->prepare("INSERT INTO appointments (booking_id, patient_id, doctor_id, hospital_id, appointment_date, appointment_time, reason, status, payment_status) VALUES (?, ?, ?, ?, ?, ?, ?, 'pending_payment', 'pending')");
             $stmt->execute([
                 $booking_id,
                 (int) $_SESSION['user_id'],
@@ -152,7 +151,6 @@ try {
                 'payment_method_types[0]' => 'card',
                 'line_items[0][price_data][currency]' => STRIPE_CURRENCY,
                 'line_items[0][price_data][product_data][name]' => 'Consultation with ' . $doctorName,
-                'line_items[0][price_data][unit_amount]' => STRIPE_FEE_CENTS,
                 'line_items[0][price_data][unit_amount]' => STRIPE_FEE_CENTS,
                 'line_items[0][quantity]' => 1,
                 'mode' => 'payment',
@@ -176,6 +174,7 @@ try {
             error_log("Booking failed: User ID " . $_SESSION['user_id'] . " attempting to book Doctor ID " . $doctor_id . ". SQL Error: " . $e->getMessage());
             throw $e;
         }
+
     }
 
     if ($action === 'get_appointments') {
@@ -263,7 +262,6 @@ try {
         }
         exit;
     }
-
     if ($action === 'reschedule_appointment') {
         $appointment_id = $_POST['appointment_id'] ?? '';
         $new_date = $_POST['appointment_date'] ?? '';
@@ -377,7 +375,6 @@ try {
         }
         exit;
     }
-
     if ($action === 'update_health_info') {
         $age = $_POST['age'] ?? null;
         $height = $_POST['height'] ?? '';

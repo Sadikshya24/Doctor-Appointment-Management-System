@@ -181,7 +181,7 @@
             } else if (result.status === 'success') {
                 closeBookingModal();
                 switchTab(null, 'appointments');
-                showBill(result.booking_id, 'Dr. ' + result.doctor_name, result.appointment_date + ' at ' + result.appointment_time.slice(0, 5), result.fee || '$10.00');
+                showBill(result.booking_id, 'Dr. ' + result.doctor_name, result.appointment_date + ' at ' + result.appointment_time.slice(0, 5), result.fee || 'Rs. 1000');
             } else {
                 const errDiv = document.getElementById('booking-error');
                 errDiv.textContent = result.message || result.error;
@@ -197,7 +197,6 @@
         document.getElementById('bill-doctor').textContent = doctorName;
         document.getElementById('bill-datetime').textContent = datetime;
         document.getElementById('bill-fee').textContent = fee;
-
         const titleEl = document.querySelector('#bill-modal h3');
         const noteEl = document.querySelector('#bill-content p:last-child');
 
@@ -210,7 +209,6 @@
             noteEl.innerHTML = 'Please present this booking ID at the hospital counter to pay the fee.<br>Keep this document safe.';
             noteEl.style.color = '#888';
         }
-
         document.getElementById('bill-modal').classList.add('active');
     }
     window.showBill = showBill;
@@ -563,7 +561,7 @@
             <form action="../logic/common/update_photo.php" method="POST" enctype="multipart/form-data">
                 <input type="file" name="profile_photo" accept="image/*" class="pd-input" required
                     style="margin-bottom:15px; padding: 10px; background: var(--input-bg);">
-                <button type="submit" class="pd-btn" style="width:100%;"><i class="fas fa-upload"></i> Upload
+                <button type="submit" class="pd-btn" style="background:var(--success); width:100%;"><i class="fas fa-upload"></i> Upload
                     Photo</button>
             </form>
         </div>
@@ -616,8 +614,8 @@
             <form onsubmit="uploadHealthFile(event)" style="margin-bottom: 20px;">
                 <input type="file" id="h-file" accept=".pdf" class="pd-input" required
                     style="margin-bottom:10px; width:100%; background: var(--input-bg);">
-                <button type="submit" class="pd-btn" style="width:100%;"><i class="fas fa-upload"></i> Upload
-                    Record</button>
+                <button type="submit" class="pd-btn" style="width:100%; background: var(--success);"><i
+                        class="fas fa-upload"></i> Upload Record</button>
             </form>
             <div id="health-files-list">
                 <!-- Loaded via JS -->
@@ -778,7 +776,7 @@
                     ` : ''}
 
                     <div style="display:flex; flex-direction:column; gap:8px; margin-top: 15px;">
-                        <button class="pd-btn" style="width:100%;" onclick="showBill('${a.booking_id}', 'Dr. ${escapeQuotes(a.doctor_name)}', '${a.appointment_date} at ${a.appointment_time.slice(0, 5)}', '$10.00', ${a.payment_status === 'paid'})">
+                        <button class="pd-btn" style="width:100%;" onclick="showBill('${a.booking_id}', 'Dr. ${escapeQuotes(a.doctor_name)}', '${a.appointment_date} at ${a.appointment_time.slice(0, 5)}', 'Rs. 1000', ${a.payment_status === 'paid'})">
                             <i class="fas fa-file-invoice"></i> ${a.payment_status === 'paid' ? 'View Receipt' : 'View Bill'}
                         </button>
                         
@@ -1048,7 +1046,6 @@
             showToast('An error occurred during deletion connection.', 'error');
         }
     }
-
     async function refundAppt(id) {
         const confirmed = await showConfirm({
             title: 'Request Refund?',

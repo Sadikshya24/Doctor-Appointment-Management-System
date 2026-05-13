@@ -1,9 +1,14 @@
 <?php
 // logic/patient/stripe_config.php
 
-// Replace these with your actual Stripe Test API Keys
-define('STRIPE_SECRET_KEY', 'sk_test_51TWKojHQVNEpEehPZzCmvA9wgKMKCYxcCKciDCyzBIT8arXMgjefhVfYmfXR9Q64zXFYv1SdQ0o4DPZc5U3ojzDv00jybL4NPa');
-define('STRIPE_PUBLISHABLE_KEY', 'pk_test_51TWKojHQVNEpEehPoglWyeX89VBaf3yznD2ijwa8eTqjx5lOgboY8PgAM82kFUheSqlR3Ro6YXDmRfCGLOmmrXst00ny4GhwNt');
+// Load keys from local file if exists, otherwise use placeholders
+if (file_exists(__DIR__ . '/stripe_keys.php')) {
+    require_once __DIR__ . '/stripe_keys.php';
+} else {
+    define('STRIPE_SECRET_KEY', 'sk_test_placeholder');
+    define('STRIPE_PUBLISHABLE_KEY', 'pk_test_placeholder');
+}
+
 define('STRIPE_CURRENCY', 'usd');
 define('STRIPE_FEE_CENTS', 1000); // $10.00 USD
 define('STRIPE_FEE_LABEL', '$10.00');
