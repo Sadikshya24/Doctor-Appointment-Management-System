@@ -130,6 +130,7 @@ try {
 
         $booking_id = 'BK-' . strtoupper(substr(uniqid(), -6)) . '-' . rand(100, 999);
 
+        try {
             $stmt = $pdo->prepare("INSERT INTO appointments (booking_id, patient_id, doctor_id, hospital_id, appointment_date, appointment_time, reason, status, payment_status) VALUES (?, ?, ?, ?, ?, ?, ?, 'pending_payment', 'pending')");
             $stmt->execute([
                 $booking_id,
