@@ -12,6 +12,7 @@ CREATE TABLE IF NOT EXISTS `users` (
   `role` enum('patient','doctor','hospital','superadmin') NOT NULL DEFAULT 'patient',
   `status` enum('active','inactive') NOT NULL DEFAULT 'active',
   `google_id` varchar(100) DEFAULT NULL UNIQUE,
+  `is_verified` tinyint(1) NOT NULL DEFAULT 0,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -57,10 +58,13 @@ CREATE TABLE IF NOT EXISTS `appointments` (
   `hospital_id` int(11) DEFAULT NULL,
   `appointment_date` date NOT NULL,
   `appointment_time` time NOT NULL,
-  `status` enum('scheduled','completed','cancelled','reschedule_requested','missed') DEFAULT 'scheduled',
+  `status` enum('scheduled','completed','cancelled','reschedule_requested','missed','pending_payment','refunded') DEFAULT 'scheduled',
   `requested_date` date DEFAULT NULL,
   `requested_time` time DEFAULT NULL,
   `reason` text,
+  `stripe_session_id` varchar(255) DEFAULT NULL,
+  `payment_intent_id` varchar(255) DEFAULT NULL,
+  `payment_status` enum('pending','paid','refunded','failed') DEFAULT 'pending',
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   PRIMARY KEY (`id`),
   FOREIGN KEY (`patient_id`) REFERENCES `users`(`id`),
