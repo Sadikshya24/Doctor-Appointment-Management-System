@@ -2,22 +2,22 @@
     --primary-color: #5995fd;
     --primary-hover: #4d84e2;
     --primary-light: #eef2ff;
-    
+
     --success: #10b981;
     --danger: #ef4444;
     --warning: #f59e0b;
     --info: #3b82f6;
-    
+
     --bg-body: #f8fafc;
     --bg-card: #ffffff;
     --bg-input: #f1f5f9;
-    
+
     --text-main: #1e293b;
     --text-muted: #64748b;
     --text-white: #ffffff;
-    
+
     --border-color: #e2e8f0;
-    --shadow: 0 10px 30px rgba(0, 0, 0, 0.08); /* Unified Shadow */
+    --shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
     --radius-md: 12px;
     --radius-lg: 16px;
 }
@@ -120,8 +120,15 @@ body {
 }
 
 @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(5px); }
-    to { opacity: 1; transform: translateY(0); }
+    from {
+        opacity: 0;
+        transform: translateY(5px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 /* Form Alerts */
@@ -159,6 +166,18 @@ body {
     transition: all 0.3s ease;
 }
 
+.input-field.password-field {
+    grid-template-columns: 14% 72% 14%;
+}
+
+.input-field.password-field i.toggle-password {
+    cursor: pointer;
+}
+
+.input-field.password-field i.toggle-password:hover {
+    color: var(--primary-color);
+}
+
 .input-field:focus-within {
     border-color: var(--primary-color);
     background: var(--bg-card);
@@ -176,7 +195,8 @@ body {
     color: var(--primary-color);
 }
 
-.input-field input, .input-field select {
+.input-field input,
+.input-field select {
     background: none;
     outline: none;
     border: none;
@@ -207,7 +227,8 @@ body {
 .input-field.has-error {
     border-color: var(--danger);
     background: #fef2f2;
-    margin-bottom: 4px; /* Reduced from 20px to make room for the error text right below */
+    margin-bottom: 4px;
+    /* Reduced from 20px to make room for the error text right below */
 }
 
 .input-field.has-error i {
@@ -262,7 +283,7 @@ body {
     border: 1px solid var(--border-color);
 }
 
-.radio-group input[type="radio"]:checked + span {
+.radio-group input[type="radio"]:checked+span {
     background-color: var(--primary-light);
     color: var(--primary-color);
     border-color: var(--primary-color);
@@ -387,13 +408,29 @@ body {
     font-weight: 500;
 }
 
-.toast.active { transform: translateX(0); }
-.toast.success { border-left-color: var(--success); }
-.toast.error { border-left-color: var(--danger); }
-.toast.info { border-left-color: var(--info); }
-.toast.warning { border-left-color: var(--warning); }
+.toast.active {
+    transform: translateX(0);
+}
 
-.toast-icon { font-size: 1.2rem; }
+.toast.success {
+    border-left-color: var(--success);
+}
+
+.toast.error {
+    border-left-color: var(--danger);
+}
+
+.toast.info {
+    border-left-color: var(--info);
+}
+
+.toast.warning {
+    border-left-color: var(--warning);
+}
+
+.toast-icon {
+    font-size: 1.2rem;
+}
 
 /* --- Custom Confirmation Modal --- */
 .confirm-overlay {
@@ -439,8 +476,13 @@ body {
     display: block;
 }
 
-.confirm-modal .confirm-icon-info { color: var(--primary-color); }
-.confirm-modal .confirm-icon-danger { color: var(--danger); }
+.confirm-modal .confirm-icon-info {
+    color: var(--primary-color);
+}
+
+.confirm-modal .confirm-icon-danger {
+    color: var(--danger);
+}
 
 .confirm-modal h2 {
     font-size: 1.5rem;
@@ -486,7 +528,9 @@ body {
     color: #fff;
 }
 
-.confirm-btn-action:hover { background: var(--primary-hover); }
+.confirm-btn-action:hover {
+    background: var(--primary-hover);
+}
 
 .confirm-btn-danger {
     background: var(--danger);

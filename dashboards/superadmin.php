@@ -41,17 +41,53 @@ include '../includes/layout/header.php';
 
     <!-- Main Content -->
     <main class="main-content">
+        <?php
+        $stmtSA = $pdo->prepare("SELECT is_verified FROM users WHERE id = ?");
+        $stmtSA->execute([$_SESSION['user_id']]);
+        $_SESSION['is_verified'] = $stmtSA->fetchColumn();
+        ?>
         <header class="top-bar">
             <div class="search-box">
                 <i class="fas fa-search"></i>
                 <input type="text" id="searchInput" placeholder="Search anything...">
             </div>
-            <div class="user-profile">
-                <span class="user-name"><?php echo htmlspecialchars($_SESSION['name']); ?></span>
-                <img src="../<?php echo $_SESSION['profile_photo'] ?? 'assets/img/default.jpeg'; ?>" alt="Admin"
-                    class="avatar">
+            <div class="user-profile-wrapper">
+                <div class="user-profile" id="profileToggle">
+                    <span class="user-name"><?php echo htmlspecialchars($_SESSION['name']); ?></span>
+                    <img src="../<?php echo $_SESSION['profile_photo'] ?? 'assets/img/default.jpeg'; ?>" alt="Admin"
+                        class="avatar" onerror="this.src='../assets/img/default.jpeg'">
+                    <i class="fas fa-chevron-down dropdown-icon"></i>
+                </div>
+                <div class="profile-dropdown" id="profileDropdown">
+                    <div class="dropdown-header" style="padding: 10px 14px; border-bottom: 1px solid var(--border-color); margin-bottom: 5px;">
+                        <div style="font-weight: 700; color: var(--text-main); font-size: 0.9rem;"><?php echo htmlspecialchars($_SESSION['name']); ?></div>
+                        <div style="color: var(--text-muted); font-size: 0.8rem;">Superadmin</div>
+                    </div>
+                    <a href="#" onclick="showToast('Profile editing coming soon for admin', 'info'); return false;">
+                        <i class="fas fa-user-circle"></i> Edit Profile
+                    </a>
+                    <a href="../reset_password.php">
+                        <i class="fas fa-key"></i> Change Password
+                    </a>
+                    <div class="dropdown-divider"></div>
+                    <a href="../logic/auth/logout.php" class="logout-link">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </a>
+                </div>
             </div>
         </header>
+        
+        <?php if (isset($_SESSION['is_verified']) && $_SESSION['is_verified'] == 0): ?>
+            <div class="verification-banner" style="background: #fff3cd; color: #856404; padding: 15px 25px; margin: 20px; border-radius: 10px; border-left: 5px solid #ffeeba; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
+                <div style="display: flex; align-items: center; gap: 15px;">
+                    <i class="fas fa-exclamation-triangle" style="font-size: 1.2rem;"></i>
+                    <span><strong>Verify your email!</strong> Please check your inbox to confirm your email address. Some features may be restricted until verified.</span>
+                </div>
+                <form action="../resend_verification.php" method="POST" style="margin: 0;">
+                    <button type="submit" style="background: #856404; color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; font-weight: 600; transition: all 0.3s ease;">Resend Email</button>
+                </form>
+            </div>
+        <?php endif; ?>
 
         <!-- DASHBOARD PAGE -->
         <section id="dashboard" class="page-section active">
@@ -100,10 +136,7 @@ include '../includes/layout/header.php';
                         </div>
                         <div class="input-field-modern">
                             <label>Password</label>
-                            <div style="position: relative; display: flex; align-items: center;">
-                                <input type="password" name="password" required style="width: 100%; padding-right: 40px;">
-                                <i class="fas fa-eye toggle-password" style="position: absolute; right: 15px; cursor: pointer; color: var(--admin-text-light);" title="Toggle password visibility"></i>
-                            </div>
+                            <input type="password" name="password" required>
                         </div>
                         <div class="input-field-modern">
                             <label>Phone Number</label>
@@ -113,7 +146,8 @@ include '../includes/layout/header.php';
                         <div style="display:flex; gap:10px; margin-bottom:15px;">
                             <div class="input-field-modern" style="flex:1; margin-bottom:0;">
                                 <label>Province</label>
-                                <select name="province" id="sa-province" required onchange="updateSACities()" style="width:100%;">
+                                <select name="province" id="sa-province" required onchange="updateSACities()"
+                                    style="width:100%;">
                                     <option value="" disabled selected>Select Province</option>
                                     <option value="Koshi">Koshi</option>
                                     <option value="Madhesh">Madhesh</option>
