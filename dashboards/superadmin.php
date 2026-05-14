@@ -15,7 +15,9 @@ include '../includes/layout/header.php';
 ?>
 
 <link rel="stylesheet" href="../assets/css/superadmin/superadmin.css">
+<link rel="stylesheet" href="../assets/css/superadmin/superadmin_enhanced.css">
 <link rel="stylesheet" href="../assets/css/common/dashboard_wrapper.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <div class="admin-layout">
     <!-- Sidebar -->
@@ -31,6 +33,21 @@ include '../includes/layout/header.php';
             <li data-page="hospitals">
                 <i class="fas fa-hospital"></i> <span>Hospitals</span>
             </li>
+            <li data-page="doctors">
+                <i class="fas fa-user-md"></i> <span>Doctors</span>
+            </li>
+            <li data-page="patients">
+                <i class="fas fa-user-injured"></i> <span>Patients</span>
+            </li>
+            <li data-page="appointments">
+                <i class="fas fa-calendar-check"></i> <span>Appointments</span>
+            </li>
+            <li data-page="analytics">
+                <i class="fas fa-analytics"></i> <span>Analytics</span>
+            </li>
+            <li data-page="logs">
+                <i class="fas fa-history"></i> <span>Audit Logs</span>
+            </li>
         </ul>
         <div class="sidebar-footer">
             <a href="../logic/auth/logout.php" class="logout-btn">
@@ -38,6 +55,7 @@ include '../includes/layout/header.php';
             </a>
         </div>
     </aside>
+
 
     <!-- Main Content -->
     <main class="main-content">
@@ -47,10 +65,6 @@ include '../includes/layout/header.php';
         $_SESSION['is_verified'] = $stmtSA->fetchColumn();
         ?>
         <header class="top-bar">
-            <div class="search-box">
-                <i class="fas fa-search"></i>
-                <input type="text" id="searchInput" placeholder="Search anything...">
-            </div>
             <div class="user-profile-wrapper">
                 <div class="user-profile" id="profileToggle">
                     <span class="user-name"><?php echo htmlspecialchars($_SESSION['name']); ?></span>
@@ -89,108 +103,8 @@ include '../includes/layout/header.php';
             </div>
         <?php endif; ?>
 
-        <!-- DASHBOARD PAGE -->
-        <section id="dashboard" class="page-section active">
-            <div class="welcome-banner">
-                <h1>Welcome back, Admin!</h1>
-                <p>Here's what's happening with MedScape today.</p>
-            </div>
+        <?php include 'superadmin_content.php'; ?>
 
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-icon p-bg"><i class="fas fa-hospital"></i></div>
-                    <div class="stat-info">
-                        <h3>Total Hospitals</h3>
-                        <h2 id="hospitalCount">0</h2>
-                    </div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon d-bg"><i class="fas fa-user-md"></i></div>
-                    <div class="stat-info">
-                        <h3>Total Doctors</h3>
-                        <h2 id="doctorCount">0</h2>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-
-        <!-- HOSPITALS PAGE -->
-        <section id="hospitals" class="page-section">
-            <div class="section-header">
-                <h2>Hospital Management</h2>
-            </div>
-            <div class="content-grid" style="grid-template-columns: 1fr 1.5fr;">
-                <div class="grid-box">
-                    <h3>Add New Hospital</h3>
-                    <form id="addHospitalForm">
-                        <div class="input-field-modern">
-                            <label>Hospital Name</label>
-                            <input type="text" name="name" required>
-                        </div>
-                        <div class="input-field-modern">
-                            <label>Email Address</label>
-                            <input type="email" name="email"
-                                pattern="[a-zA-Z0-9]+@(gmail\.com|outlook\.com|yahoo\.com|hotmail\.com|yopmail\.com)"
-                                title="Only Alphanumeric @gmail/outlook/yahoo/hotmail/yopmail.com allowed" required>
-                        </div>
-                        <div class="input-field-modern">
-                            <label>Password</label>
-                            <input type="password" name="password" required>
-                        </div>
-                        <div class="input-field-modern">
-                            <label>Phone Number</label>
-                            <input type="tel" name="phone" pattern="9[0-9]{9}" title="10 digits starting with 9"
-                                required>
-                        </div>
-                        <div style="display:flex; gap:10px; margin-bottom:15px;">
-                            <div class="input-field-modern" style="flex:1; margin-bottom:0;">
-                                <label>Province</label>
-                                <select name="province" id="sa-province" required onchange="updateSACities()"
-                                    style="width:100%;">
-                                    <option value="" disabled selected>Select Province</option>
-                                    <option value="Koshi">Koshi</option>
-                                    <option value="Madhesh">Madhesh</option>
-                                    <option value="Bagmati">Bagmati</option>
-                                    <option value="Gandaki">Gandaki</option>
-                                    <option value="Lumbini">Lumbini</option>
-                                    <option value="Karnali">Karnali</option>
-                                    <option value="Sudurpaschim">Sudurpaschim</option>
-                                </select>
-                            </div>
-                            <div class="input-field-modern" style="flex:1; margin-bottom:0;">
-                                <label>City</label>
-                                <select name="city" id="sa-city" required style="width:100%;">
-                                    <option value="" disabled selected>Select City</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="input-field-modern">
-                            <label>Location / Street</label>
-                            <input type="text" name="location" placeholder="e.g. Near Bus Stand" required>
-                        </div>
-                        <button type="submit" class="btn-primary-modern">Register Hospital</button>
-                    </form>
-                </div>
-                <div class="grid-box">
-                    <h3>Existing Hospitals</h3>
-                    <div class="table-container shadow-none">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Name</th>
-                                    <th>Location</th>
-                                    <th>Status</th>
-                                    <th>Action</th>
-                                </tr>
-                            </thead>
-                            <tbody id="hospitalTable"></tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </section>
-        </section>
     </main>
 </div>
 

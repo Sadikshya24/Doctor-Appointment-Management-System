@@ -495,7 +495,7 @@ try {
         // Basic AI Logic: Average load per day of week over last 60 days
         $forecast = [];
         $days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-        
+
         $stats_query = "
             SELECT DAYNAME(appointment_date) as day_name, COUNT(*) as count
             FROM appointments
@@ -516,9 +516,9 @@ try {
             $date = date('Y-m-d', strtotime("+$i days"));
             $dayName = date('l', strtotime($date));
             $dayAbbr = date('D', strtotime($date)); // 'Mon', 'Tue', etc.
-            
+
             $isWorking = in_array($dayAbbr, $working_days);
-            
+
             if (!$isWorking) {
                 $predicted = 0;
             } else {
@@ -540,13 +540,18 @@ try {
             FROM reports r
             JOIN users u ON r.patient_id = u.id
             WHERE r.doctor_id = ? 
-              AND (r.prescription LIKE '%follow%' OR r.report_details LIKE '%follow%' OR r.diagnosis LIKE '%follow%')
+              AND (
+                  r.prescription REGEXP 'follow|next|review|return|check-?up|again|visit' OR
+                  r.report_details REGEXP 'follow|next|review|return|check-?up|again|visit' OR
+                  r.diagnosis REGEXP 'follow|next|review|return|check-?up|again|visit' OR
+                  r.details REGEXP 'follow|next|review|return|check-?up|again|visit'
+              )
               AND NOT EXISTS (
                   SELECT 1 FROM appointments a 
                   WHERE a.patient_id = r.patient_id 
                     AND a.doctor_id = ? 
                     AND a.appointment_date > DATE(r.created_at)
-                    AND a.status = 'scheduled'
+                    AND a.status IN ('scheduled', 'reschedule_requested')
               )
             GROUP BY r.patient_id
             ORDER BY r.created_at DESC
@@ -558,13 +563,13 @@ try {
 
         // 3. Sync with ai_recommendations table
         foreach ($follow_ups as $fu) {
-            $check = $pdo->prepare("SELECT id FROM ai_recommendations WHERE doctor_id = ? AND patient_id = ? AND type = 'follow_up' AND status = 'pending'");
+            $check = $pdo->prepare("SELECT id FROM ai_recommendations WHERE doctor_id = ? AND patient_id = ? AND type = 'follow_up' AND status IN ('pending', 'accepted')");
             $check->execute([$doctor_id, $fu['patient_id']]);
             if (!$check->fetch()) {
                 $ins = $pdo->prepare("INSERT INTO ai_recommendations (doctor_id, patient_id, type, title, description) VALUES (?, ?, 'follow_up', ?, ?)");
                 $ins->execute([
-                    $doctor_id, 
-                    $fu['patient_id'], 
+                    $doctor_id,
+                    $fu['patient_id'],
                     "Follow-up Suggestion: " . $fu['patient_name'],
                     "Patient " . $fu['patient_name'] . " was diagnosed with '" . $fu['diagnosis'] . "' on " . date('M d', strtotime($fu['last_visit'])) . ". The report mentions a follow-up, but no future appointment is scheduled."
                 ]);

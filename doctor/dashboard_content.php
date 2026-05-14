@@ -126,7 +126,7 @@ $report_times = $check_reports->fetchAll(PDO::FETCH_KEY_PAIR);
     <div id="tab-ai_insights" class="dd-content">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:25px;">
             <div>
-                <h2 style="margin:0;"><i class="fas fa-brain" style="color: #6366f1;"></i> AI Clinical Analytics</h2>
+                <h2 style="margin:0;"><i class="fas fa-microchip" style="color: #6366f1;"></i> AI Clinical Analytics</h2>
                 <p style="color: #64748b; margin-top: 5px;">Predictive forecasting and patient follow-up
                     recommendations.</p>
             </div>
@@ -156,7 +156,7 @@ $report_times = $check_reports->fetchAll(PDO::FETCH_KEY_PAIR);
 
             <!-- Recommendations Section -->
             <div class="dd-card" style="padding: 25px;">
-                <h4 style="margin-bottom: 20px;"><i class="fas fa-lightbulb"></i> Clinical Suggestions</h4>
+                <h4 style="margin-bottom: 20px;"><i class="fas fa-stethoscope"></i> Clinical Suggestions</h4>
                 <div id="ai-recommendations-list" style="display: flex; flex-direction: column; gap: 15px;">
                     <!-- Loaded via JS -->
                 </div>
@@ -239,8 +239,8 @@ $report_times = $check_reports->fetchAll(PDO::FETCH_KEY_PAIR);
             <form action="../logic/common/update_photo.php" method="POST" enctype="multipart/form-data">
                 <input type="file" name="profile_photo" accept="image/*" class="dd-input" required
                     style="margin-bottom:15px; padding: 10px; background: var(--input-bg);">
-                <button type="submit" class="dd-btn" style="background:var(--success); width:100%;"><i
-                        class="fas fa-upload"></i> Upload Photo</button>
+                <button type="submit" class="dd-btn" style="width:100%;"><i class="fas fa-upload"></i> Upload
+                    Photo</button>
             </form>
         </div>
 
@@ -319,7 +319,7 @@ $report_times = $check_reports->fetchAll(PDO::FETCH_KEY_PAIR);
         <div id="patient-search-results" class="dd-grid">
             <div
                 style="text-align:center; padding: 50px; color:#94a3b8; grid-column: 1/-1; background:#f8fafc; border-radius:12px; border: 2px dashed #e2e8f0;">
-                <i class="fas fa-user-injured" style="font-size:3em; margin-bottom:15px; opacity: 0.5;"></i><br>
+                <i class="fas fa-user-md" style="font-size:3em; margin-bottom:15px; opacity: 0.5;"></i><br>
                 Enter a Patient ID or Name to begin clinical review.
             </div>
         </div>
@@ -508,7 +508,7 @@ $report_times = $check_reports->fetchAll(PDO::FETCH_KEY_PAIR);
             if (!appts || appts.length === 0) {
                 container.innerHTML = `
                     <div style="text-align:center; padding: 40px; color:#94a3b8; font-size:1.1em; grid-column: 1/-1; background:#f8fafc; border-radius:12px; border: 2px dashed #e2e8f0;">
-                        <i class="fas fa-mug-hot" style="font-size:2em; margin-bottom:10px;"></i><br>
+                        <i class="fas fa-calendar-day" style="font-size:2em; margin-bottom:10px;"></i><br>
                         No appointments scheduled for today.
                     </div>`;
                 return;
@@ -902,9 +902,15 @@ $report_times = $check_reports->fetchAll(PDO::FETCH_KEY_PAIR);
 
             // Render Recommendations
             if (data.recommendations && data.recommendations.length > 0) {
-                recList.innerHTML = data.recommendations.map(r => `
-                    <div class="dd-card" style="padding: 15px; border-left: 4px solid #6366f1; background: #f8fafc; position: relative;">
-                        <h5 style="margin: 0 0 8px 0; color: #1e293b; padding-right: 20px;">${r.title}</h5>
+                const count = data.recommendations.length;
+                const r = data.recommendations[0]; // Show only the first one for "switching" feel
+                
+                recList.innerHTML = `
+                    <div class="dd-card ai-insight-card" style="padding: 15px; border-left: 4px solid #6366f1; background: #f8fafc; position: relative; animation: fadeIn 0.5s ease;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                            <h5 style="margin: 0; color: #1e293b; padding-right: 20px;">${r.title}</h5>
+                            <span style="font-size: 0.7em; color: #94a3b8; font-weight: 600; white-space: nowrap;">Insight 1 of ${count}</span>
+                        </div>
                         <p style="font-size: 0.85em; color: #64748b; line-height: 1.4; margin: 0 0 12px 0;">${r.description}</p>
                         <div style="display: flex; gap: 8px;">
                             <button class="dd-btn" style="padding: 6px 12px; font-size: 0.8em; flex: 1;" onclick="handleRecommendation(${r.id}, 'accepted', ${r.patient_id}, '${escapeQuotes(r.title)}')">
@@ -916,10 +922,10 @@ $report_times = $check_reports->fetchAll(PDO::FETCH_KEY_PAIR);
                         </div>
                         <i class="fas fa-times" style="position: absolute; top: 12px; right: 12px; color: #94a3b8; cursor: pointer; font-size: 0.9em;" onclick="handleRecommendation(${r.id}, 'dismissed')" title="Dismiss"></i>
                     </div>
-                `).join('');
+                `;
             } else {
                 recList.innerHTML = `
-                    <div style="text-align: center; padding: 40px 20px; color: #94a3b8;">
+                    <div style="text-align: center; padding: 40px 20px; color: #94a3b8; animation: fadeIn 0.5s ease;">
                         <i class="fas fa-check-circle" style="font-size: 2em; color: #22c55e; opacity: 0.5; margin-bottom: 10px;"></i>
                         <p style="font-size: 0.9em; margin: 0;">AI engine reports no urgent recommendations at this time.</p>
                     </div>

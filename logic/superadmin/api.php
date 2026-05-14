@@ -2,6 +2,8 @@
 session_start();
 header("Content-Type: application/json");
 require_once '../../includes/core/db.php';
+require_once '../../includes/core/logger.php';
+
 
 // Security: Ensure only superadmin can access these actions
 if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'superadmin') {
@@ -14,15 +16,73 @@ $path = $_GET['path'] ?? '';
 $method = $_SERVER['REQUEST_METHOD'];
 
 try {
-    // 1. STATISTICS
+    // 1. STATISTICS (ENHANCED)
     if ($path === "stats") {
         echo json_encode([
             "hospitals" => (int)$pdo->query("SELECT COUNT(*) FROM hospitals")->fetchColumn(),
-            "doctors" => (int)$pdo->query("SELECT COUNT(*) FROM doctors WHERE status='approved'")->fetchColumn()
+            "doctors" => (int)$pdo->query("SELECT COUNT(*) FROM doctors WHERE status='approved'")->fetchColumn(),
+            "patients" => (int)$pdo->query("SELECT COUNT(*) FROM users WHERE role='patient'")->fetchColumn(),
+            "appointments" => (int)$pdo->query("SELECT COUNT(*) FROM appointments")->fetchColumn()
         ]);
         exit;
     }
 
+    // 2. DOCTORS
+    if ($method === "GET" && $path === "doctors") {
+        $stmt = $pdo->query("
+            SELECT d.id, u.name, d.speciality, h.user_id as hospital_user_id, 
+            (SELECT name FROM users WHERE id = h.user_id) as hospital_name,
+            u.status, d.status as doctor_approval_status
+            FROM doctors d 
+            JOIN users u ON d.user_id = u.id 
+            LEFT JOIN hospitals h ON d.hospital_id = h.id
+        ");
+        echo json_encode($stmt->fetchAll());
+        exit;
+    }
+
+    if ($method === "POST" && preg_match('/doctors\/(\d+)\/toggle-status/', $path, $m)) {
+        $id = intval($m[1]);
+        $stmt = $pdo->prepare("SELECT user_id, u.status, u.name FROM doctors d JOIN users u ON d.user_id = u.id WHERE d.id=?");
+        $stmt->execute([$id]);
+        $doc = $stmt->fetch();
+        
+        if ($doc) {
+            $newStatus = $doc['status'] === 'active' ? 'inactive' : 'active';
+            $pdo->prepare("UPDATE users SET status=? WHERE id=?")->execute([$newStatus, $doc['user_id']]);
+            logSystemActivity($pdo, "Doctor status toggled", json_encode([
+                "doctor_id" => $id,
+                "doctor_name" => $doc['name'],
+                "new_status" => $newStatus
+            ]));
+            echo json_encode(["success" => true, "new_status" => $newStatus]);
+        } else {
+            echo json_encode(["status" => "error", "message" => "Doctor not found."]);
+        }
+        exit;
+    }
+
+    // 3. PATIENTS
+    if ($method === "GET" && $path === "patients") {
+        $stmt = $pdo->query("SELECT id, name, email, phone, status, created_at FROM users WHERE role='patient'");
+        echo json_encode($stmt->fetchAll());
+        exit;
+    }
+
+    // 4. APPOINTMENTS
+    if ($method === "GET" && $path === "appointments") {
+        $stmt = $pdo->query("
+            SELECT a.id, a.booking_id, p.name as patient_name, d_u.name as doctor_name, 
+            a.appointment_date, a.appointment_time, a.status 
+            FROM appointments a 
+            JOIN users p ON a.patient_id = p.id 
+            JOIN doctors d ON a.doctor_id = d.id 
+            JOIN users d_u ON d.user_id = d_u.id
+            ORDER BY a.created_at DESC
+        ");
+        echo json_encode($stmt->fetchAll());
+        exit;
+    }
 
     // 5. HOSPITALS
     if ($method === "GET" && $path === "hospitals") {
@@ -39,60 +99,93 @@ try {
         $province = $data['province'] ?? '';
         $city = $data['city'] ?? '';
         $location = $data['location'] ?? 'Location Pending';
-
         $phone = $data['phone'] ?? '';
 
         $pdo->beginTransaction();
-        
-        // 1. Create User
         $stmt = $pdo->prepare("INSERT INTO users (name, email, phone, password_hash, role) VALUES (?, ?, ?, ?, 'hospital')");
         $stmt->execute([$name, $email, $phone, password_hash($password, PASSWORD_DEFAULT)]);
         $user_id = $pdo->lastInsertId();
         
-        // 2. Create Hospital Entry
         $stmt = $pdo->prepare("INSERT INTO hospitals (user_id, province, city, location, description) VALUES (?, ?, ?, ?, 'Added by Admin')");
         $stmt->execute([$user_id, $province, $city, $location]);
         
+        logSystemActivity($pdo, "Hospital added", json_encode(["hospital_name" => $name, "email" => $email]));
         $pdo->commit();
-        logActivity($pdo, "Hospital added: $name", $_SESSION['name'] ?? 'Admin');
         echo json_encode(["success" => true]);
         exit;
     }
 
     if ($method === "POST" && preg_match('/hospitals\/(\d+)\/toggle-status/', $path, $m)) {
         $id = intval($m[1]);
-        $pdo->beginTransaction();
-        
-        // Get user_id and current status
-        $stmt = $pdo->prepare("SELECT user_id, u.status FROM hospitals h JOIN users u ON h.user_id = u.id WHERE h.id=?");
+        $stmt = $pdo->prepare("SELECT user_id, u.status, u.name FROM hospitals h JOIN users u ON h.user_id = u.id WHERE h.id=?");
         $stmt->execute([$id]);
         $hosp = $stmt->fetch();
         
         if ($hosp) {
             $newStatus = $hosp['status'] === 'active' ? 'inactive' : 'active';
             $pdo->prepare("UPDATE users SET status=? WHERE id=?")->execute([$newStatus, $hosp['user_id']]);
-            logActivity($pdo, "Hospital status changed to $newStatus (ID $id)", $_SESSION['name'] ?? 'Admin');
-            $pdo->commit();
+            logSystemActivity($pdo, "Hospital status toggled", json_encode([
+                "hospital_id" => $id,
+                "hospital_name" => $hosp['name'],
+                "new_status" => $newStatus
+            ]));
             echo json_encode(["success" => true, "new_status" => $newStatus]);
         } else {
-            $pdo->rollBack();
             echo json_encode(["status" => "error", "message" => "Hospital not found."]);
         }
         exit;
     }
 
+    // 6. ANALYTICS
+    if ($path === "analytics") {
+        // Appointments by day (Last 7 days)
+        $stmt1 = $pdo->query("
+            SELECT DATE(created_at) as date, COUNT(*) as count 
+            FROM appointments 
+            WHERE created_at >= DATE_SUB(CURDATE(), INTERVAL 7 DAY) 
+            GROUP BY DATE(created_at)
+            ORDER BY date ASC
+        ");
+        
+        // Specialty distribution
+        $stmt2 = $pdo->query("
+            SELECT speciality, COUNT(*) as count 
+            FROM doctors 
+            GROUP BY speciality
+        ");
 
+        // User registration trend
+        $stmt3 = $pdo->query("
+            SELECT DATE(created_at) as date, role, COUNT(*) as count 
+            FROM users 
+            WHERE created_at >= DATE_SUB(CURDATE(), INTERVAL 30 DAY)
+            GROUP BY DATE(created_at), role
+            ORDER BY date ASC
+        ");
+
+        echo json_encode([
+            "appointments_trend" => $stmt1->fetchAll(),
+            "specialty_distribution" => $stmt2->fetchAll(),
+            "registration_trend" => $stmt3->fetchAll()
+        ]);
+        exit;
+    }
+
+    // 7. LOGS
+    if ($path === "logs") {
+        $stmt = $pdo->query("SELECT * FROM logs ORDER BY created_at DESC LIMIT 100");
+        echo json_encode($stmt->fetchAll(PDO::FETCH_ASSOC));
+        exit;
+    }
 
     echo json_encode(["error" => "Invalid API route"]);
 
 } catch (Exception $e) {
-    if ($pdo->inTransaction()) $pdo->rollBack();
+    if (isset($pdo) && $pdo->inTransaction()) $pdo->rollBack();
     http_response_code(500);
     echo json_encode(["error" => $e->getMessage()]);
 }
 
-function logActivity($pdo, $message, $user) {
-    $stmt = $pdo->prepare("INSERT INTO logs (action, user) VALUES (?, ?)");
-    $stmt->execute([$message, $user]);
-}
-?>
+
+
+

@@ -311,7 +311,7 @@ require_once 'includes/layout/header.php';
     <div class="stat-card">
         <i class="fas fa-users"></i>
         <h3><?php echo htmlspecialchars($stats['patients']); ?>+</h3>
-        <p>Happy Patients</p>
+        <p>Registered Patients</p>
     </div>
 </div>
 
