@@ -77,6 +77,18 @@ body {
     text-align: left;
 }
 
+.input-field.password-field {
+    grid-template-columns: 14% 72% 14%;
+}
+
+.input-field.password-field i.toggle-password {
+    cursor: pointer;
+}
+
+.input-field.password-field i.toggle-password:hover {
+    color: var(--primary-color);
+}
+
 .input-field:focus-within {
     border-color: var(--primary-color);
     background: var(--bg-card);

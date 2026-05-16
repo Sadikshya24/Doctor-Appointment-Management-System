@@ -12,7 +12,9 @@ CREATE TABLE IF NOT EXISTS `users` (
   `role` enum('patient','doctor','hospital','superadmin') NOT NULL DEFAULT 'patient',
   `status` enum('active','inactive') NOT NULL DEFAULT 'active',
   `google_id` varchar(100) DEFAULT NULL UNIQUE,
-  `is_verified` tinyint(1) NOT NULL DEFAULT 0,
+  `is_verified` tinyint(1) DEFAULT 0,
+  `verification_token` varchar(255) DEFAULT NULL,
+  `verification_token_expires_at` datetime DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -117,8 +119,8 @@ CREATE TABLE IF NOT EXISTS `password_resets` (
 -- --------------------------------------------------------
 
 -- Insert Superadmin (Password: @Password123)
-INSERT INTO `users` (`name`, `email`, `phone`, `password_hash`, `role`, `status`) VALUES 
-('Super Admin', 'medscape444@gmail.com', '9800000000', '$2y$10$Pe5ICHxa9MtFP8/krNaRtu7jAulOQLByKtnmAMNth6Vt4Zg.VJUs6', 'superadmin', 'active');
+INSERT INTO `users` (`name`, `email`, `phone`, `password_hash`, `role`, `status`, `is_verified`) VALUES 
+('Super Admin', 'medscape444@gmail.com', '9800000000', '$2y$10$Pe5ICHxa9MtFP8/krNaRtu7jAulOQLByKtnmAMNth6Vt4Zg.VJUs6', 'superadmin', 'active', 1);
 
 -- Insert Hospital Users
 INSERT INTO `users` (`name`, `email`, `phone`, `password_hash`, `role`, `status`) VALUES 

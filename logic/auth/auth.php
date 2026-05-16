@@ -54,6 +54,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $_SESSION['email'] = $user['email'];
             $_SESSION['role'] = $user['role'];
             $_SESSION['name'] = $user['name'];
+            $_SESSION['is_verified'] = $user['is_verified'] ?? 0;
             $_SESSION['last_activity'] = time(); // Fixed initial timestamp
 
             if ($role === 'superadmin') {
@@ -113,16 +114,77 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Hash password securely
         $hashed_password = password_hash($password, PASSWORD_DEFAULT);
 
-        // Insert new user into database
-        $stmt = $pdo->prepare('INSERT INTO users (name, email, phone, password_hash, role) VALUES (?, ?, ?, ?, ?)');
+        // Generate verification token
+        $verification_token = bin2hex(random_bytes(32));
+        $verification_expires_at = date('Y-m-d H:i:s', strtotime('+24 hours'));
 
-        if ($stmt->execute([$name, $email, $phone, $hashed_password, $role])) {
+        // Insert new user into database
+        $stmt = $pdo->prepare('INSERT INTO users (name, email, phone, password_hash, role, verification_token, verification_token_expires_at) VALUES (?, ?, ?, ?, ?, ?, ?)');
+
+        if ($stmt->execute([$name, $email, $phone, $hashed_password, $role, $verification_token, $verification_expires_at])) {
+            $user_id = $pdo->lastInsertId();
+
+            // Send Verification Email
+            require '../../includes/lib/PHPMailer/src/Exception.php';
+            require '../../includes/lib/PHPMailer/src/PHPMailer.php';
+            require '../../includes/lib/PHPMailer/src/SMTP.php';
+
+            $mail = new \PHPMailer\PHPMailer\PHPMailer(true);
+            try {
+                $mail->isSMTP();
+                $mail->Host = SMTP_HOST;
+                $mail->SMTPAuth = true;
+                $mail->Username = SMTP_USER;
+                $mail->Password = SMTP_PASS;
+                $mail->SMTPSecure = SMTP_SECURE;
+                $mail->Port = SMTP_PORT;
+
+                $mail->setFrom(SYSTEM_EMAIL, SYSTEM_NAME);
+                $mail->addAddress($email);
+
+                // Check path construction to ensure correct verify link
+                $base_url = "http://" . $_SERVER['HTTP_HOST'];
+                $path = dirname(dirname(dirname($_SERVER['PHP_SELF'])));
+                if ($path === '\\' || $path === '/') $path = '';
+                $verifyLink = $base_url . $path . "/verify.php?token=" . $verification_token;
+
+                $mail->isHTML(true);
+                $mail->Subject = 'Verify Your Email Address - MedScape';
+                $mail->Body = "Hello " . htmlspecialchars($name) . ",<br><br>"
+                    . "Thank you for registering at MedScape. Please click the link below to verify your email address:<br><br>"
+                    . "<a href='" . htmlspecialchars($verifyLink) . "'>" . htmlspecialchars($verifyLink) . "</a><br><br>"
+                    . "This link will expire in 24 hours.";
+                $mail->AltBody = "Hello " . $name . ",\n\n"
+                    . "Please click the following link to verify your email address:\n"
+                    . $verifyLink . "\n\n"
+                    . "This link will expire in 24 hours.";
+
+                $mail->send();
+            } catch (\Exception $e) {
+                // Email sending failed, but user is registered.
+                // We can optionally log this error.
+            }
             $user_id = $pdo->lastInsertId();
 
             if ($role === 'doctor') {
                 $nmc_number = $_POST['nmc_number'] ?? '';
                 $hospital_id = $_POST['hospital_id'] ?? '';
                 $cv_path = '';
+
+                if (!preg_match('/^[0-9]{3,6}$/', $nmc_number)) {
+                    $_SESSION['auth_error'] = 'Invalid NMC Number. It must be numeric and 3-6 digits only.';
+                    header('Location: ../../login.php');
+                    exit;
+                }
+
+                // Check if NMC number clashes with an already approved doctor
+                $stmt_nmc = $pdo->prepare("SELECT id FROM doctors WHERE nmc_number = ? AND status = 'approved'");
+                $stmt_nmc->execute([$nmc_number]);
+                if ($stmt_nmc->fetch()) {
+                    $_SESSION['auth_error'] = 'This NMC number is already registered to an approved doctor.';
+                    header('Location: ../../login.php');
+                    exit;
+                }
 
                 if (empty($hospital_id)) {
                     $_SESSION['auth_error'] = 'Doctors must strictly select an affiliated hospital during signup.';
@@ -172,6 +234,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $_SESSION['email'] = $email;
             $_SESSION['role'] = $role;
             $_SESSION['name'] = $name;
+            $_SESSION['is_verified'] = 0;
             $_SESSION['last_activity'] = time(); // New timestamp
 
             if ($role === 'superadmin') {

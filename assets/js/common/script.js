@@ -16,6 +16,22 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
+    // Password visibility toggle
+    const togglePasswordIcons = document.querySelectorAll('.toggle-password');
+    togglePasswordIcons.forEach(icon => {
+        icon.addEventListener('click', function() {
+            const input = this.parentElement.querySelector('input');
+            if (input.type === 'password') {
+                input.type = 'text';
+                this.classList.remove('fa-eye');
+                this.classList.add('fa-eye-slash');
+            } else {
+                input.type = 'password';
+                this.classList.remove('fa-eye-slash');
+                this.classList.add('fa-eye');
+            }
+        });
+    });
     // Toggle doctor fields on signup
     const roleRadios = document.querySelectorAll('#signup input[name="role"]');
     const doctorFields = document.getElementById('doctor-fields');
@@ -37,8 +53,100 @@ document.addEventListener('DOMContentLoaded', () => {
                     nmcInput.removeAttribute('required');
                     cvInput.removeAttribute('required');
                     hospitalInput.removeAttribute('required');
+                    
+                    // Clear errors when hiding
+                    [nmcInput, cvInput, hospitalInput].forEach(input => {
+                        const evt = new Event('input');
+                        input.dispatchEvent(evt);
+                    });
                 }
             });
+        });
+    }
+
+    // Real-time Form Validation
+    const authForms = document.querySelectorAll('.auth-form-container form');
+    
+    authForms.forEach(form => {
+        const inputs = form.querySelectorAll('input:not([type="hidden"]):not([type="radio"]), select');
+        
+        inputs.forEach(input => {
+            // Create error message element if not exists and field is inside input-field
+            const inputField = input.closest('.input-field');
+            if (inputField && !inputField.nextElementSibling?.classList.contains('input-error-msg')) {
+                const errorSpan = document.createElement('div');
+                errorSpan.className = 'input-error-msg';
+                inputField.parentNode.insertBefore(errorSpan, inputField.nextSibling);
+            }
+
+            const validateInput = () => {
+                const inputField = input.closest('.input-field');
+                if (!inputField) return;
+                
+                const errorSpan = inputField.nextElementSibling;
+                if (!errorSpan || !errorSpan.classList.contains('input-error-msg')) return;
+
+                if (!input.checkValidity() && (input.required || input.value.trim() !== '')) {
+                    inputField.classList.add('has-error');
+                    inputField.classList.remove('has-success');
+                    errorSpan.style.display = 'block';
+                    
+                    if (input.validity.valueMissing) {
+                        errorSpan.textContent = 'This field is required.';
+                    } else if (input.validity.patternMismatch) {
+                        errorSpan.textContent = input.title || `Please enter a valid format.`;
+                    } else if (input.validity.typeMismatch) {
+                        if (input.type === 'email') errorSpan.textContent = 'Please enter a valid email address.';
+                        else errorSpan.textContent = `Please enter a valid value.`;
+                    } else {
+                        errorSpan.textContent = 'Invalid value.';
+                    }
+                } else if (input.checkValidity() && input.value.trim() !== '') {
+                    inputField.classList.remove('has-error');
+                    inputField.classList.add('has-success');
+                    errorSpan.style.display = 'none';
+                    errorSpan.textContent = '';
+                } else {
+                    // Empty and not required (or hidden)
+                    inputField.classList.remove('has-error', 'has-success');
+                    errorSpan.style.display = 'none';
+                    errorSpan.textContent = '';
+                }
+            };
+
+            input.addEventListener('input', validateInput);
+            input.addEventListener('change', validateInput); // specific for select/file
+            input.addEventListener('blur', validateInput);
+        });
+
+        // Trigger validation on submit to ensure errors show
+        form.addEventListener('submit', (e) => {
+            if (!form.checkValidity()) {
+                e.preventDefault();
+                inputs.forEach(input => {
+                    input.dispatchEvent(new Event('input'));
+                });
+            }
+        });
+    });
+
+    // Profile Dropdown Toggle
+    const profileToggle = document.getElementById('profileToggle');
+    const profileDropdown = document.getElementById('profileDropdown');
+
+    if (profileToggle && profileDropdown) {
+        profileToggle.addEventListener('click', (e) => {
+            e.stopPropagation();
+            profileDropdown.classList.toggle('show');
+            profileToggle.classList.toggle('active');
+        });
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!profileToggle.contains(e.target) && !profileDropdown.contains(e.target)) {
+                profileDropdown.classList.remove('show');
+                profileToggle.classList.remove('active');
+            }
         });
     }
 });

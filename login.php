@@ -31,9 +31,10 @@ require_once 'includes/layout/header.php'; ?>
                         pattern="[A-Za-z0-9]+@(gmail\.com|outlook\.com|yahoo\.com|hotmail\.com|yopmail\.com)"
                         required />
                 </div>
-                <div class="input-field">
+                <div class="input-field password-field">
                     <i class="fas fa-lock"></i>
                     <input type="password" name="password" placeholder="Password" required />
+                    <i class="fas fa-eye toggle-password" title="Toggle password visibility"></i>
                 </div>
 
                 <div class="role-selector">
@@ -73,12 +74,13 @@ require_once 'includes/layout/header.php'; ?>
                     <i class="fas fa-phone"></i>
                     <input type="tel" name="phone" placeholder="Phone" pattern="9[0-9]{9}" required />
                 </div>
-                <div class="input-field">
+                <div class="input-field password-field">
                     <i class="fas fa-lock"></i>
                     <input type="password" name="password" placeholder="Password" 
                         pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$"
                         title="At least 8 characters, with uppercase, lowercase, number and special char"
                         required />
+                    <i class="fas fa-eye toggle-password" title="Toggle password visibility"></i>
                 </div>
                 <p style="font-size: 0.72rem; color: var(--text-muted); margin: -10px 0 10px 5px; line-height: 1.2;">
                     <i class="fas fa-info-circle"></i> 8+ chars: A-Z, a-z, 0-9 & symbols.
@@ -106,7 +108,7 @@ require_once 'includes/layout/header.php'; ?>
                     </div>
                     <div class="input-field">
                         <i class="fas fa-id-card"></i>
-                        <input type="text" name="nmc_number" id="nmc_number" placeholder="NMC Number" />
+                        <input type="text" name="nmc_number" id="nmc_number" placeholder="NMC Number" pattern="[0-9]{3,6}" title="Numeric and 3-6 digits only" />
                     </div>
                     <div class="input-field" style="height: auto; padding: 12px 15px; display: block;">
                         <label

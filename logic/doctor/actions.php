@@ -488,6 +488,117 @@ try {
         exit;
     }
 
+    if ($action === 'get_ai_insights') {
+        header('Content-Type: application/json');
+
+        // 1. Forecast Patient Volume (Next 7 Days)
+        // Basic AI Logic: Average load per day of week over last 60 days
+        $forecast = [];
+        $days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+        
+        $stats_query = "
+            SELECT DAYNAME(appointment_date) as day_name, COUNT(*) as count
+            FROM appointments
+            WHERE doctor_id = ? AND appointment_date >= DATE_SUB(CURDATE(), INTERVAL 60 DAY)
+            GROUP BY day_name
+        ";
+        $stmt_stats = $pdo->prepare($stats_query);
+        $stmt_stats->execute([$doctor_id]);
+        $history = $stmt_stats->fetchAll(PDO::FETCH_KEY_PAIR);
+
+        // Fetch doctor's working days
+        $doc_stmt = $pdo->prepare("SELECT available_days FROM doctors WHERE id = ?");
+        $doc_stmt->execute([$doctor_id]);
+        $avail_str = $doc_stmt->fetchColumn() ?: 'Mon,Tue,Wed,Thu,Fri';
+        $working_days = array_map('trim', explode(',', $avail_str));
+
+        for ($i = 0; $i < 7; $i++) {
+            $date = date('Y-m-d', strtotime("+$i days"));
+            $dayName = date('l', strtotime($date));
+            $dayAbbr = date('D', strtotime($date)); // 'Mon', 'Tue', etc.
+            
+            $isWorking = in_array($dayAbbr, $working_days);
+            
+            if (!$isWorking) {
+                $predicted = 0;
+            } else {
+                // If history exists, use average; else default to 1 for working day
+                $predicted = isset($history[$dayName]) ? ceil($history[$dayName] / 8) : 1;
+            }
+
+            $forecast[] = [
+                "date" => $date,
+                "day" => $dayName,
+                "predicted_load" => $predicted
+            ];
+        }
+
+        // 2. Patient Follow-up Suggestions
+        // AI Logic: Patients with 'completed' status who mentioned 'follow' in reports but have no future appointments
+        $suggestions_query = "
+            SELECT r.patient_id, u.name as patient_name, r.diagnosis, r.created_at as last_visit
+            FROM reports r
+            JOIN users u ON r.patient_id = u.id
+            WHERE r.doctor_id = ? 
+              AND (r.prescription LIKE '%follow%' OR r.report_details LIKE '%follow%' OR r.diagnosis LIKE '%follow%')
+              AND NOT EXISTS (
+                  SELECT 1 FROM appointments a 
+                  WHERE a.patient_id = r.patient_id 
+                    AND a.doctor_id = ? 
+                    AND a.appointment_date > DATE(r.created_at)
+                    AND a.status = 'scheduled'
+              )
+            GROUP BY r.patient_id
+            ORDER BY r.created_at DESC
+            LIMIT 5
+        ";
+        $stmt_sug = $pdo->prepare($suggestions_query);
+        $stmt_sug->execute([$doctor_id, $doctor_id]);
+        $follow_ups = $stmt_sug->fetchAll();
+
+        // 3. Sync with ai_recommendations table
+        foreach ($follow_ups as $fu) {
+            $check = $pdo->prepare("SELECT id FROM ai_recommendations WHERE doctor_id = ? AND patient_id = ? AND type = 'follow_up' AND status = 'pending'");
+            $check->execute([$doctor_id, $fu['patient_id']]);
+            if (!$check->fetch()) {
+                $ins = $pdo->prepare("INSERT INTO ai_recommendations (doctor_id, patient_id, type, title, description) VALUES (?, ?, 'follow_up', ?, ?)");
+                $ins->execute([
+                    $doctor_id, 
+                    $fu['patient_id'], 
+                    "Follow-up Suggestion: " . $fu['patient_name'],
+                    "Patient " . $fu['patient_name'] . " was diagnosed with '" . $fu['diagnosis'] . "' on " . date('M d', strtotime($fu['last_visit'])) . ". The report mentions a follow-up, but no future appointment is scheduled."
+                ]);
+            }
+        }
+
+        // 4. Fetch current pending recommendations
+        $rec_stmt = $pdo->prepare("SELECT * FROM ai_recommendations WHERE doctor_id = ? AND status = 'pending' ORDER BY created_at DESC");
+        $rec_stmt->execute([$doctor_id]);
+        $recommendations = $rec_stmt->fetchAll();
+
+        echo json_encode([
+            "forecast" => $forecast,
+            "recommendations" => $recommendations
+        ]);
+        exit;
+    }
+
+    if ($action === 'update_ai_recommendation') {
+        header('Content-Type: application/json');
+        $id = $_POST['id'] ?? '';
+        $status = $_POST['status'] ?? ''; // 'accepted', 'ignored', 'dismissed'
+
+        if (!$id || !$status) {
+            echo json_encode(["status" => "error", "message" => "Missing data."]);
+            exit;
+        }
+
+        $stmt = $pdo->prepare("UPDATE ai_recommendations SET status = ? WHERE id = ? AND doctor_id = ?");
+        $stmt->execute([$status, $id, $doctor_id]);
+        echo json_encode(["status" => "success", "message" => "Recommendation updated."]);
+        exit;
+    }
+
     header('Content-Type: application/json');
     echo json_encode(["error" => "Invalid action specified."]);
 } catch (Exception $e) {
