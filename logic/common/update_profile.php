@@ -21,8 +21,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     // Strict Phone Validation
-    if (!empty($phone) && !preg_match('/^9[0-9]{9}$/', $phone)) {
-        $_SESSION['toast_msg'] = "Invalid phone number. Must be exactly 10 digits and start with 9.";
+    if (!empty($phone) && !preg_match('/^(97|98)[0-9]{8}$/', $phone)) {
+        $_SESSION['toast_msg'] = "Please enter a valid Nepali phone number.";
         $_SESSION['toast_type'] = "error";
         header("Location: " . ($_SERVER['HTTP_REFERER'] ?? '../../index.php'));
         exit;

@@ -84,8 +84,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         // Strict Phone Validation
-        if (!preg_match('/^9[0-9]{9}$/', $phone)) {
-            $_SESSION['auth_error'] = 'Invalid phone number. Must be exactly 10 digits and start with 9.';
+        if (!preg_match('/^(97|98)[0-9]{8}$/', $phone)) {
+            $_SESSION['auth_error'] = 'Please enter a valid Nepali phone number.';
             header('Location: ../../login.php');
             exit;
         }

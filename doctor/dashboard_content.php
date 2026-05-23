@@ -216,8 +216,8 @@ $report_times = $check_reports->fetchAll(PDO::FETCH_KEY_PAIR);
                 <div class="dd-group">
                     <label>Phone Number</label>
                     <input type="text" name="phone" class="dd-input"
-                        value="<?php echo htmlspecialchars($currentPhone); ?>" pattern="9[0-9]{9}"
-                        title="10 digits starting with 9">
+                        value="<?php echo htmlspecialchars($currentPhone); ?>" pattern="(97|98)[0-9]{8}"
+                        title="Please enter a valid Nepali phone number.">
                 </div>
                 <button type="submit" class="dd-btn" style="width:100%;">Save Personal Details</button>
             </form>

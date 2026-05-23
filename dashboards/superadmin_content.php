@@ -76,7 +76,7 @@
                     </div>
                     <div class="input-field-modern">
                         <label>Phone</label>
-                        <input type="tel" name="phone" required>
+                        <input type="tel" name="phone" pattern="(97|98)[0-9]{8}" title="Please enter a valid Nepali phone number." required>
                     </div>
                     <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px; margin-bottom: 15px;">
                         <div class="input-field-modern">

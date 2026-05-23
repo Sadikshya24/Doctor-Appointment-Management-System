@@ -26,9 +26,9 @@ if ($action === 'add_hospital') {
         exit;
     }
 
-    // Strict Phone Validation (starts with 9, 10 digits)
-    if (!empty($phone) && !preg_match('/^9[0-9]{9}$/', $phone)) {
-        echo json_encode(['error' => 'Invalid phone. Must be 10 digits starting with 9.']);
+    // Strict Phone Validation (starts with 97 or 98, 10 digits)
+    if (!empty($phone) && !preg_match('/^(97|98)[0-9]{8}$/', $phone)) {
+        echo json_encode(['error' => 'Please enter a valid Nepali phone number.']);
         exit;
     }
 

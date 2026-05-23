@@ -75,7 +75,7 @@ require_once 'includes/layout/header.php'; ?>
                 </div>
                 <div class="input-field">
                     <i class="fas fa-phone"></i>
-                    <input type="tel" name="phone" placeholder="Phone" pattern="9[0-9]{9}" required />
+                    <input type="tel" name="phone" placeholder="Phone" pattern="(97|98)[0-9]{8}" title="Please enter a valid Nepali phone number." required />
                 </div>
                 <div class="input-field password-field">
                     <i class="fas fa-lock"></i>
