@@ -26,12 +26,12 @@ $pageTitle = 'Doctor Dashboard - MedScape';
 include '../includes/layout/header.php';
 
 $menuItems = [
-    ['id' => 'overview', 'label' => 'Dashboard Overview', 'icon' => 'fas fa-chart-line', 'active' => true],
-    ['id' => 'ai_insights', 'label' => 'AI Analytics', 'icon' => 'fas fa-microchip', 'active' => false],
-    ['id' => 'bookings', 'label' => 'Patient Bookings', 'icon' => 'fas fa-calendar-alt', 'active' => false],
-    ['id' => 'consulted', 'label' => 'Consulted Patients', 'icon' => 'fas fa-clipboard-check', 'active' => false],
-    ['id' => 'search', 'label' => 'Patient Search', 'icon' => 'fas fa-search', 'active' => false],
-    ['id' => 'settings', 'label' => 'Profile & Availability', 'icon' => 'fas fa-user-cog', 'active' => false],
+    ['id' => 'overview', 'label' => 'Dashboard Overview', 'icon' => '', 'active' => true],
+    ['id' => 'ai_insights', 'label' => 'AI Analytics', 'icon' => '', 'active' => false],
+    ['id' => 'bookings', 'label' => 'Patient Bookings', 'icon' => '', 'active' => false],
+    ['id' => 'consulted', 'label' => 'Consulted Patients', 'icon' => '', 'active' => false],
+    ['id' => 'search', 'label' => 'Patient Search', 'icon' => '', 'active' => false],
+    ['id' => 'settings', 'label' => 'Profile & Availability', 'icon' => '', 'active' => false],
 ];
 
 renderDashboardLayout($role, $userName, $userPhoto, $menuItems, 'dashboard_content.php');

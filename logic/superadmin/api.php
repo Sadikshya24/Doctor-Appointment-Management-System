@@ -43,7 +43,7 @@ try {
 
     if ($method === "POST" && preg_match('/doctors\/(\d+)\/toggle-status/', $path, $m)) {
         $id = intval($m[1]);
-        $stmt = $pdo->prepare("SELECT user_id, u.status, u.name FROM doctors d JOIN users u ON d.user_id = u.id WHERE d.id=?");
+        $stmt = $pdo->prepare("SELECT user_id, u.status, u.name, u.email FROM doctors d JOIN users u ON d.user_id = u.id WHERE d.id=?");
         $stmt->execute([$id]);
         $doc = $stmt->fetch();
         
@@ -55,6 +55,21 @@ try {
                 "doctor_name" => $doc['name'],
                 "new_status" => $newStatus
             ]));
+
+            // Email Notification
+            require_once '../../includes/core/email_helper.php';
+            $subject = "Account Status Update - MedScape";
+            $statusText = ($newStatus === 'active') ? "ACTIVATED" : "DEACTIVATED";
+            $message = "Hello " . htmlspecialchars($doc['name']) . ",<br><br>";
+            $message .= "Your MedScape account status has been updated to: <strong>" . $statusText . "</strong>.<br>";
+            if ($newStatus === 'active') {
+                $message .= "You can now log in to the portal.<br>";
+            } else {
+                $message .= "Your access has been suspended by the administrator. Please contact support if you believe this is an error.<br>";
+            }
+            $message .= "<br>Regards,<br>MedScape Administration";
+            sendEmail($doc['email'], $subject, $message);
+
             echo json_encode(["success" => true, "new_status" => $newStatus]);
         } else {
             echo json_encode(["status" => "error", "message" => "Doctor not found."]);
@@ -117,7 +132,7 @@ try {
 
     if ($method === "POST" && preg_match('/hospitals\/(\d+)\/toggle-status/', $path, $m)) {
         $id = intval($m[1]);
-        $stmt = $pdo->prepare("SELECT user_id, u.status, u.name FROM hospitals h JOIN users u ON h.user_id = u.id WHERE h.id=?");
+        $stmt = $pdo->prepare("SELECT user_id, u.status, u.name, u.email FROM hospitals h JOIN users u ON h.user_id = u.id WHERE h.id=?");
         $stmt->execute([$id]);
         $hosp = $stmt->fetch();
         
@@ -129,9 +144,66 @@ try {
                 "hospital_name" => $hosp['name'],
                 "new_status" => $newStatus
             ]));
+
+            // Email Notification
+            require_once '../../includes/core/email_helper.php';
+            $subject = "Hospital Access Update - MedScape";
+            $statusText = ($newStatus === 'active') ? "ACTIVATED" : "DEACTIVATED";
+            $message = "Hello " . htmlspecialchars($hosp['name']) . ",<br><br>";
+            $message .= "Your MedScape Hospital account status has been updated to: <strong>" . $statusText . "</strong>.<br>";
+            if ($newStatus === 'active') {
+                $message .= "Your hospital portal is now fully functional.<br>";
+            } else {
+                $message .= "Your hospital portal access has been suspended by the system administrator.<br>";
+            }
+            $message .= "<br>Regards,<br>MedScape Administration";
+            sendEmail($hosp['email'], $subject, $message);
+
+            // Notification
+            $notifTitle = "Account Status Updated";
+            $notifMsg = "Your hospital account has been " . ($newStatus === 'active' ? 'activated' : 'deactivated') . " by the system administrator.";
+            $stmt_n = $pdo->prepare("INSERT INTO notifications (user_id, title, message, type) VALUES (?, ?, ?, ?)");
+            $stmt_n->execute([$hosp['user_id'], $notifTitle, $notifMsg, $newStatus === 'active' ? 'success' : 'warning']);
+
             echo json_encode(["success" => true, "new_status" => $newStatus]);
         } else {
             echo json_encode(["status" => "error", "message" => "Hospital not found."]);
+        }
+        exit;
+    }
+
+    if ($method === "POST" && preg_match('/patients\/(\d+)\/toggle-status/', $path, $m)) {
+        $id = intval($m[1]);
+        $stmt = $pdo->prepare("SELECT id, status, name, email FROM users WHERE id=? AND role='patient'");
+        $stmt->execute([$id]);
+        $pat = $stmt->fetch();
+        
+        if ($pat) {
+            $newStatus = $pat['status'] === 'active' ? 'inactive' : 'active';
+            $pdo->prepare("UPDATE users SET status=? WHERE id=?")->execute([$newStatus, $id]);
+            logSystemActivity($pdo, "Patient status toggled", json_encode([
+                "patient_id" => $id,
+                "patient_name" => $pat['name'],
+                "new_status" => $newStatus
+            ]));
+
+            // Email Notification
+            require_once '../../includes/core/email_helper.php';
+            $subject = "Account Status Update - MedScape";
+            $statusText = ($newStatus === 'active') ? "ACTIVATED" : "DEACTIVATED";
+            $message = "Hello " . htmlspecialchars($pat['name']) . ",<br><br>";
+            $message .= "Your MedScape account status has been updated to: <strong>" . $statusText . "</strong>.<br>";
+            if ($newStatus === 'active') {
+                $message .= "You can now log in and access your medical history.<br>";
+            } else {
+                $message .= "Your account has been deactivated. Please contact support for assistance.<br>";
+            }
+            $message .= "<br>Regards,<br>MedScape Administration";
+            sendEmail($pat['email'], $subject, $message);
+
+            echo json_encode(["success" => true, "new_status" => $newStatus]);
+        } else {
+            echo json_encode(["status" => "error", "message" => "Patient not found."]);
         }
         exit;
     }

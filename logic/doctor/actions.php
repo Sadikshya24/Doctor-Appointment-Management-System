@@ -57,7 +57,7 @@ try {
 
         $query = "
             SELECT a.id, a.patient_id, a.appointment_date, a.appointment_time, a.status, a.reason,
-                   a.requested_date, a.requested_time, 
+                   a.requested_date, a.requested_time, a.payment_status,
                    u.name AS patient_name, u.email AS patient_email, hu.name AS hospital_name,
                    r.id AS report_id, r.created_at AS report_created_at
             FROM appointments a 
@@ -186,6 +186,15 @@ try {
         $stmt = $pdo->prepare("UPDATE appointments SET appointment_date = ?, appointment_time = ?, status = 'scheduled', requested_date = NULL, requested_time = NULL WHERE id = ? AND doctor_id = ?");
         $stmt->execute([$new_date, $new_time, $appointment_id, $doctor_id]);
 
+        // Notify Patient
+        $stmt_pat = $pdo->prepare("SELECT patient_id, booking_id FROM appointments WHERE id = ?");
+        $stmt_pat->execute([$appointment_id]);
+        $appt_data = $stmt_pat->fetch();
+        if ($appt_data) {
+            $stmt_n = $pdo->prepare("INSERT INTO notifications (user_id, title, message, type) VALUES (?, 'Appointment Rescheduled', ?, 'warning')");
+            $stmt_n->execute([$appt_data['patient_id'], "Your appointment #" . $appt_data['booking_id'] . " was rescheduled to " . $new_date . " at " . $new_time . " by the doctor."]);
+        }
+
         echo json_encode(["status" => "success", "message" => "Appointment rescheduled naturally!"]);
         exit;
     }
@@ -212,6 +221,16 @@ try {
 
         $stmt = $pdo->prepare("UPDATE appointments SET appointment_date = requested_date, appointment_time = requested_time, status = 'scheduled', requested_date = NULL, requested_time = NULL WHERE id = ? AND doctor_id = ? AND status = 'reschedule_requested'");
         $stmt->execute([$appointment_id, $doctor_id]);
+
+        // Notify Patient
+        $stmt_pat = $pdo->prepare("SELECT patient_id, booking_id FROM appointments WHERE id = ?");
+        $stmt_pat->execute([$appointment_id]);
+        $appt_data = $stmt_pat->fetch();
+        if ($appt_data) {
+            $stmt_n = $pdo->prepare("INSERT INTO notifications (user_id, title, message, type) VALUES (?, 'Reschedule Approved', ?, 'success')");
+            $stmt_n->execute([$appt_data['patient_id'], "Your reschedule request for booking #" . $appt_data['booking_id'] . " has been approved."]);
+        }
+
         echo json_encode(["status" => "success", "message" => "Patient's reschedule request approved!"]);
         exit;
     }
@@ -225,6 +244,16 @@ try {
         }
         $stmt = $pdo->prepare("UPDATE appointments SET status = 'scheduled', requested_date = NULL, requested_time = NULL WHERE id = ? AND doctor_id = ? AND status = 'reschedule_requested'");
         $stmt->execute([$appointment_id, $doctor_id]);
+
+        // Notify Patient
+        $stmt_pat = $pdo->prepare("SELECT patient_id, booking_id FROM appointments WHERE id = ?");
+        $stmt_pat->execute([$appointment_id]);
+        $appt_data = $stmt_pat->fetch();
+        if ($appt_data) {
+            $stmt_n = $pdo->prepare("INSERT INTO notifications (user_id, title, message, type) VALUES (?, 'Reschedule Declined', ?, 'warning')");
+            $stmt_n->execute([$appt_data['patient_id'], "Your reschedule request for booking #" . $appt_data['booking_id'] . " was declined. The original time remains."]);
+        }
+
         echo json_encode(["status" => "success", "message" => "Patient's reschedule request declined."]);
         exit;
     }
@@ -247,6 +276,16 @@ try {
 
         $stmt = $pdo->prepare("UPDATE appointments SET status = 'completed' WHERE id = ? AND doctor_id = ?");
         $stmt->execute([$appointment_id, $doctor_id]);
+
+        // Notify Patient
+        $stmt_pat = $pdo->prepare("SELECT patient_id, booking_id FROM appointments WHERE id = ?");
+        $stmt_pat->execute([$appointment_id]);
+        $appt_data = $stmt_pat->fetch();
+        if ($appt_data) {
+            $stmt_n = $pdo->prepare("INSERT INTO notifications (user_id, title, message, type) VALUES (?, 'Consultation Completed', ?, 'success')");
+            $stmt_n->execute([$appt_data['patient_id'], "Your consultation for booking #" . $appt_data['booking_id'] . " has been marked as completed."]);
+        }
+
         echo json_encode(["status" => "success", "message" => "Appointment marked as completed."]);
         exit;
     }
@@ -264,10 +303,15 @@ try {
             exit;
         }
 
-        // 1. Insert Report (Removed redundant 'details' column)
-        $stmt = $pdo->prepare("INSERT INTO reports (appointment_id, patient_id, doctor_id, diagnosis, report_details, prescription) VALUES (?, ?, ?, ?, ?, ?)");
-        $stmt->execute([$appointment_id ?: null, $patient_id, $doctor_id, $diagnosis, $report_details, $prescription]);
+        // 1. Insert Report
+        $details = "Diagnosis: $diagnosis. Notes: $report_details";
+        $stmt = $pdo->prepare("INSERT INTO reports (appointment_id, patient_id, doctor_id, diagnosis, report_details, prescription, details) VALUES (?, ?, ?, ?, ?, ?, ?)");
+        $stmt->execute([$appointment_id ?: null, $patient_id, $doctor_id, $diagnosis, $report_details, $prescription, $details]);
         $report_id = $pdo->lastInsertId();
+
+        // Notify Patient
+        $stmt_notif = $pdo->prepare("INSERT INTO notifications (user_id, title, message, type) VALUES (?, 'Medical Report Ready', CONCAT('Your medical report for booking #', (SELECT booking_id FROM appointments WHERE id = ?), ' has been issued.'), 'success')");
+        $stmt_notif->execute([$patient_id, $appointment_id]);
 
         // 2. Insert Initial Version into History
         $hist = $pdo->prepare("INSERT INTO report_history (report_id, diagnosis, report_details, prescription, version_number) VALUES (?, ?, ?, ?, 1)");
@@ -295,19 +339,19 @@ try {
             exit;
         }
 
-        // 1. Ownership and Time Validation (24 hours)
-        $chk = $pdo->prepare("SELECT created_at FROM reports WHERE id = ? AND doctor_id = ?");
+        // 1. Ownership and Time Validation (1 hour post consultation)
+        $chk = $pdo->prepare("SELECT a.appointment_date, a.appointment_time FROM reports r JOIN appointments a ON r.appointment_id = a.id WHERE r.id = ? AND r.doctor_id = ?");
         $chk->execute([$report_id, $doctor_id]);
-        $report = $chk->fetch();
+        $appt = $chk->fetch();
 
-        if (!$report) {
+        if (!$appt) {
             echo json_encode(["status" => "error", "message" => "Report not found or unauthorized."]);
             exit;
         }
 
-        $created_time = strtotime($report['created_at']);
-        if (time() - $created_time > 86400) { // 24 hours in seconds
-            echo json_encode(["status" => "error", "message" => "Edit window closed. Reports can only be edited within 24 hours."]);
+        $consultation_time = strtotime($appt['appointment_date'] . ' ' . $appt['appointment_time']);
+        if (time() - $consultation_time > 3600) { // 1 hour in seconds
+            echo json_encode(["status" => "error", "message" => "Edit window closed. Reports can only be edited until 1 hour after consultation time."]);
             exit;
         }
 
@@ -474,7 +518,8 @@ try {
 
         // Fetch all finalized reports for this patient across ALL doctors
         $query = "
-            SELECT r.*, u_doc.name as doctor_name, d.speciality, a.appointment_date
+            SELECT r.*, u_doc.name as doctor_name, d.speciality, a.appointment_date, a.appointment_time,
+                   (r.doctor_id = ?) as is_owner
             FROM reports r
             JOIN doctors d ON r.doctor_id = d.id
             JOIN users u_doc ON d.user_id = u_doc.id
@@ -483,7 +528,7 @@ try {
             ORDER BY r.created_at DESC
         ";
         $stmt = $pdo->prepare($query);
-        $stmt->execute([$patient_id]);
+        $stmt->execute([$doctor_id, $patient_id]);
         echo json_encode($stmt->fetchAll());
         exit;
     }

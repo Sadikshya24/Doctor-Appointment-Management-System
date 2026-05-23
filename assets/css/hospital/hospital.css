@@ -1,156 +1,210 @@
-    :root {
-        --primary: var(--primary-color);
-    }
+@import url('../common/tokens.css');
 
-    .hd-tabs {
-        display: flex;
-        gap: 15px;
-        border-bottom: 2px solid var(--border-color);
-        margin: 30px 0 20px 0;
-    }
 
-    .hd-tab {
-        padding: 10px 20px;
-        cursor: pointer;
-        font-weight: 500;
-        color: #666;
-        border-bottom: 3px solid transparent;
-        transition: 0.3s;
-    }
 
-    .hd-tab:hover,
-    .hd-tab.active {
-        color: var(--primary);
-    }
+.hd-tabs {
+    display: flex;
+    gap: var(--space-4);
+    border-bottom: 2px solid var(--border-color);
+    margin: var(--space-8) 0 var(--space-5) 0;
+}
 
-    .hd-tab.active {
-        border-bottom: 3px solid var(--primary);
-    }
+.hd-tab {
+    padding: var(--space-2) var(--space-5);
+    cursor: pointer;
+    font-weight: var(--fw-medium);
+    color: var(--text-muted);
+    border-bottom: 3px solid transparent;
+    transition: var(--transition-base);
+}
 
-    .hd-content {
-        display: none;
-        animation: fadeIn 0.4s ease;
-    }
+.hd-tab:hover,
+.hd-tab.active {
+    color: var(--primary);
+}
 
-    .hd-content.active {
-        display: block;
-    }
+.hd-tab.active {
+    border-bottom: 3px solid var(--primary);
+}
 
-    .hd-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-        gap: 20px;
-    }
+.hd-content {
+    display: none;
+    animation: fadeIn 0.4s ease;
+}
 
-    .hd-card {
-        background: var(--bg-card);
-        border: 1px solid var(--border-color);
-        border-radius: 12px;
-        padding: 20px;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.04);
-        position: relative;
-    }
+.hd-content.active {
+    display: block;
+}
 
-    .hd-card h4 {
-        margin: 0 0 10px 0;
-        color: var(--text-main);
-        font-size: 1.2rem;
-    }
+.hd-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: var(--space-5);
+}
 
-    .hd-card p {
-        color: #555;
-        margin: 5px 0;
-        font-size: 0.95rem;
-    }
+.hd-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    padding: var(--space-5);
+    box-shadow: var(--shadow-sm);
+    position: relative;
+    transition: transform var(--transition-base), box-shadow var(--transition-base);
+}
 
-    .hd-btn {
-        background: var(--primary);
-        color: #fff;
-        border: none;
-        padding: 10px 15px;
-        border-radius: 5px;
-        cursor: pointer;
-        transition: 0.2s;
-        font-size: 0.9em;
-        font-weight: 600;
-    }
+.hd-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
 
-    .hd-btn:hover {
-        opacity: 0.9;
-        transform: translateY(-1px);
-    }
+.hd-card h4 {
+    margin: 0 0 var(--space-2) 0;
+    color: var(--text-main);
+    font-size: var(--fs-lg);
+    line-height: var(--lh-tight);
+    padding-right: 80px;
+}
 
-    .hd-btn-success {
-        background: var(--success);
-    }
 
-    .hd-btn-danger {
-        background: var(--danger);
-    }
+.hd-card p {
+    color: var(--text-muted);
+    margin: var(--space-1) 0;
+    font-size: var(--fs-sm);
+}
 
-    .hd-btn-outline {
-        background: transparent;
-        border: 1px solid var(--primary);
-        color: var(--primary);
-    }
+.hd-btn {
+    background: transparent;
+    color: var(--primary);
+    border: 1px solid var(--gray-200);
+    padding: var(--space-2) var(--space-4);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: var(--transition-fast);
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-semibold);
+}
 
-    .hd-btn-outline:hover {
-        background: var(--primary-light);
-        color: var(--primary-hover);
-    }
+.hd-btn:hover {
+    background: var(--primary-light);
+    color: var(--primary-hover);
+    transform: translateY(-1px);
+}
 
-    /* Modal CSS */
-    .hd-modal-overlay {
-        position: fixed;
-        top: 0; left: 0; right: 0; bottom: 0;
-        background: rgba(0, 0, 0, 0.5);
-        display: none;
-        justify-content: center;
-        align-items: center;
-        z-index: 1000;
-        backdrop-filter: blur(4px);
-    }
-    .hd-modal-overlay.active {
-        display: flex;
-    }
-    .hd-modal {
-        background: #fff;
-        padding: 30px;
-        border-radius: 15px;
-        width: 90%;
-        max-width: 500px;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-    }
-    .hd-modal-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 20px;
-    }
-    .hd-modal-header h3 {
-        margin: 0;
-    }
-    .hd-modal-close {
-        background: none;
-        border: none;
-        font-size: 1.5em;
-        cursor: pointer;
-        color: #666;
-    }
-    .hd-group {
-        display: flex;
-        flex-direction: column;
-        margin-bottom: 15px;
-    }
-    .hd-group label {
-        font-weight: 600;
-        margin-bottom: 5px;
-        color: #444;
-    }
-    .hd-input {
-        padding: 10px;
-        border: 1px solid var(--border-color);
-        border-radius: 5px;
-        width: 100%;
-        box-sizing: border-box;
-    }
+.hd-btn-success { 
+    background: transparent;
+    color: var(--success);
+    border: 1px solid var(--gray-200);
+}
+.hd-btn-success:hover { 
+    background: var(--success-light);
+    color: #059669;
+}
+
+.hd-btn-danger { 
+    background: transparent;
+    color: var(--danger);
+    border: 1px solid var(--gray-200);
+}
+.hd-btn-danger:hover { 
+    background: var(--danger-light);
+    color: #be123c;
+}
+
+.hd-btn-outline {
+    background: transparent;
+    border: 1px solid var(--gray-200);
+    color: var(--primary);
+}
+
+.hd-btn-outline:hover {
+    background: var(--primary-light);
+    color: var(--primary-hover);
+}
+
+/* Modal CSS */
+.hd-modal-overlay {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(15, 23, 42, 0.4);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    backdrop-filter: blur(4px);
+    padding: var(--space-4);
+}
+
+.hd-modal-overlay.active {
+    display: flex;
+}
+
+.hd-modal {
+    background: var(--white);
+    padding: var(--space-8);
+    border-radius: var(--radius-lg);
+    width: 100%;
+    max-width: 500px;
+    box-shadow: var(--shadow-xl);
+    animation: slideUp 0.3s ease;
+}
+
+.hd-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--space-5);
+}
+
+.hd-modal-header h3 {
+    margin: 0;
+    font-size: var(--fs-xl);
+    color: var(--text-main);
+    font-weight: var(--fw-bold);
+}
+
+.hd-modal-close {
+    background: none;
+    border: none;
+    font-size: var(--fs-2xl);
+    cursor: pointer;
+    color: var(--text-muted);
+    line-height: 1;
+}
+
+.hd-modal-close:hover {
+    color: var(--text-main);
+}
+
+.hd-group {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: var(--space-4);
+}
+
+.hd-group label {
+    font-weight: var(--fw-semibold);
+    margin-bottom: var(--space-1);
+    color: var(--text-main);
+    font-size: var(--fs-sm);
+}
+
+.hd-input {
+    padding: var(--space-3);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    width: 100%;
+    box-sizing: border-box;
+    font-family: var(--font-main);
+    font-size: var(--fs-sm);
+    transition: border-color var(--transition-base);
+}
+
+.hd-input:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px var(--primary-light);
+}
+
+
+/* Ensure all buttons and interactive elements are visible throughout the system */
+/* Global Button Styles maintained in respective classes */

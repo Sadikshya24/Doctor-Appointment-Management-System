@@ -4,22 +4,18 @@ let currentData = [];
 let currentPage = "dashboard";
 let charts = {};
 
-document.querySelectorAll(".sidebar-menu li").forEach(item => {
-    item.addEventListener("click", function () {
-        const pageId = this.getAttribute("data-page");
+// Global Navigation Integration
+const parentSwitchTab = window.switchTab;
+window.switchTab = function(e, tabId) {
+    if (typeof parentSwitchTab === 'function') {
+        parentSwitchTab(e, tabId);
+    }
+    
+    // Admin specific data loading
+    currentPage = tabId;
+    loadPageData(tabId);
+};
 
-        // UI Updates
-        document.querySelectorAll(".page-section").forEach(p => p.classList.remove("active"));
-        document.getElementById(pageId).classList.add("active");
-
-        document.querySelectorAll(".sidebar-menu li").forEach(li => li.classList.remove("active"));
-        this.classList.add("active");
-
-        // Load Content
-        currentPage = pageId;
-        loadPageData(pageId);
-    });
-});
 
 async function loadPageData(pageId) {
     switch (pageId) {
@@ -313,12 +309,12 @@ function renderTable(data) {
             const statusClass = item.status === 'active' ? 'badge-active' : 'badge-inactive';
             row = `
                 <tr>
-                    <td>${item.name} ${item.is_verified == 1 ? '<i class="fas fa-check-circle" style="color:#10b981;"></i>' : ''}</td>
+                    <td>${item.name}</td>
                     <td>${item.city}, ${item.province}</td>
                     <td><span class="badge ${statusClass}">${item.status.toUpperCase()}</span></td>
                     <td>
                         <button onclick="toggleHospitalStatus(${item.id}, '${item.status}')" class="btn-sm ${item.status === 'active' ? 'btn-reject' : 'btn-approve'}">
-                            <i class="fas ${item.status === 'active' ? 'fa-user-slash' : 'fa-user-check'}"></i>
+                            <i class="fa-solid ${item.status === 'active' ? 'fa-user-slash' : 'fa-user-check'}"></i>
                         </button>
                     </td>
                 </tr>`;
@@ -334,7 +330,7 @@ function renderTable(data) {
                     <td><span class="badge ${statusClass}">${item.status.toUpperCase()}</span></td>
                     <td>
                         <button onclick="toggleDoctorStatus(${item.id}, '${item.status}')" class="btn-sm ${item.status === 'active' ? 'btn-reject' : 'btn-approve'}">
-                            <i class="fas ${item.status === 'active' ? 'fa-user-slash' : 'fa-user-check'}"></i>
+                            <i class="fa-solid ${item.status === 'active' ? 'fa-user-slash' : 'fa-user-check'}"></i>
                         </button>
                     </td>
                 </tr>`;
@@ -347,6 +343,11 @@ function renderTable(data) {
                     <td>${item.phone || 'N/A'}</td>
                     <td>${new Date(item.created_at).toLocaleDateString()}</td>
                     <td><span class="badge ${statusClass}">${item.status.toUpperCase()}</span></td>
+                    <td>
+                        <button onclick="togglePatientStatus(${item.id}, '${item.status}')" class="btn-sm ${item.status === 'active' ? 'btn-reject' : 'btn-approve'}">
+                            ${item.status === 'active' ? 'Deactivate' : 'Activate'}
+                        </button>
+                    </td>
                 </tr>`;
         } else if (currentPage === "appointments") {
             const statusClass = `badge-${item.status}`;
@@ -399,6 +400,26 @@ async function toggleDoctorStatus(id, currentStatus) {
     if (result.success) {
         showToast(`Doctor ${action}d successfully`, 'success');
         loadDoctors();
+    } else {
+        showToast(result.message || "Failed to toggle status", 'error');
+    }
+}
+
+async function togglePatientStatus(id, currentStatus) {
+    const action = currentStatus === 'active' ? 'deactivate' : 'activate';
+    const confirmed = await showConfirm({
+        title: `${action.charAt(0).toUpperCase() + action.slice(1)} Patient?`,
+        message: `Are you sure you want to ${action} this patient account?`,
+        confirmText: action.charAt(0).toUpperCase() + action.slice(1),
+        type: action === 'deactivate' ? 'danger' : 'info'
+    });
+    if (!confirmed) return;
+    
+    const res = await fetch(BASE + `patients/${id}/toggle-status`, { method: "POST" });
+    const result = await res.json();
+    if (result.success) {
+        showToast(`Patient ${action}d successfully`, 'success');
+        loadPatients();
     } else {
         showToast(result.message || "Failed to toggle status", 'error');
     }

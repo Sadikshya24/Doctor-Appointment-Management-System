@@ -6,7 +6,6 @@
 <!-- Custom Confirmation Modal -->
 <div id="confirm-overlay" class="confirm-overlay">
     <div id="confirm-modal" class="confirm-modal">
-        <i id="confirm-icon" class="fas fa-info-circle confirm-icon-info"></i>
         <h2 id="confirm-title">Are you sure?</h2>
         <p id="confirm-message">This action cannot be undone.</p>
         <div class="confirm-actions">
@@ -27,7 +26,7 @@ function showToast(message, type = 'info') {
     if (type === 'error') icon = 'exclamation-circle';
     if (type === 'warning') icon = 'exclamation-triangle';
     
-    toast.innerHTML = `<i class="fas fa-${icon} toast-icon"></i> <span>${message}</span>`;
+    toast.innerHTML = `<span>${message}</span>`;
     container.appendChild(toast);
     
     setTimeout(() => toast.classList.add('active'), 10);
@@ -62,7 +61,7 @@ function showConfirm(options = {}) {
         confirmBtn.textContent = confirmText;
         cancelBtn.textContent = cancelText;
 
-        icon.className = 'fas ' + (type === 'danger' ? 'fa-exclamation-triangle confirm-icon-danger' : 'fa-info-circle confirm-icon-info');
+        // Icon removed as per request
         confirmBtn.className = 'confirm-btn ' + (type === 'danger' ? 'confirm-btn-danger' : 'confirm-btn-action');
 
         overlay.classList.add('active');

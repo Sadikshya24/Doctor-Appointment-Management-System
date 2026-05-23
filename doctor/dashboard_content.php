@@ -12,7 +12,6 @@ $doctorInfo = $stmt->fetch();
 if (!$doctorInfo || $doctorInfo['status'] === 'pending') {
     echo "
     <div class='pd-container' style='text-align: center; padding: 60px 20px;'>
-        <i class='fas fa-user-clock' style='font-size: 5rem; color: #5995fd; margin-bottom: 24px; opacity: 0.8;'></i>
         <h2 style='font-size: 2rem; margin-bottom: 16px;'>Account Pending Approval</h2>
         <p style='color: #64748b; font-size: 1.1rem; line-height: 1.6; max-width: 600px; margin: 0 auto;'>
             Your registration is currently under review. Our administration team is verifying your credentials (<b>NMC: " . htmlspecialchars($doctorInfo['nmc_number'] ?? 'N/A') . "</b>). <br><br>
@@ -29,7 +28,6 @@ if ($doctorInfo['status'] === 'rejected') {
 
     echo "
     <div class='dashboard-container' style='text-align: center; margin-top: 50px;'>
-        <i class='fas fa-times-circle' style='font-size: 4em; color: #dc3545; margin-bottom: 20px;'></i>
         <h2 style='color:var(--text-main);'>Application Rejected</h2>
         <p style='color:#666; font-size:1.1em; line-height:1.6;'>
             Unfortunately, your application was not approved by the previously selected hospital. <br>
@@ -50,7 +48,7 @@ if ($doctorInfo['status'] === 'rejected') {
                 <label style='display:block; margin-bottom:5px; font-weight:bold; color:#444;'>Upload Updated CV (PDF/DOC)</label>
                 <input type='file' name='cv_file' accept='.pdf,.doc,.docx' required style='width:100%; padding:10px; border:1px solid #ccc; border-radius:4px; background:#fff;'>
             </div>
-            <button type='submit' style='width:100%; padding:12px; background:#28a745; color:#fff; border:none; border-radius:4px; font-size:1.1em; cursor:pointer;'><i class='fas fa-paper-plane'></i> Submit Re-Application</button>
+            <button type='submit' style='width:100%; padding:12px; background:transparent; color:#28a745; border:1px solid #28a745; border-radius:4px; font-size:1.1em; cursor:pointer;'>Submit Re-Application</button>
         </form>
     </div>
     ";
@@ -81,28 +79,24 @@ $report_times = $check_reports->fetchAll(PDO::FETCH_KEY_PAIR);
     <div id="tab-overview" class="dd-content active">
         <div class="stats-grid">
             <div class="stat-card">
-                <div class="stat-icon p-bg"><i class="fas fa-calendar-alt"></i></div>
                 <div class="stat-info">
                     <h3>Total Appointments</h3>
                     <h2 id="stat-total">0</h2>
                 </div>
             </div>
             <div class="stat-card">
-                <div class="stat-icon b-bg"><i class="fas fa-clock"></i></div>
                 <div class="stat-info">
                     <h3>Appointments Today</h3>
                     <h2 id="stat-today">0</h2>
                 </div>
             </div>
             <div class="stat-card">
-                <div class="stat-icon d-bg"><i class="fas fa-user-check"></i></div>
                 <div class="stat-info">
                     <h3>Completed Visits</h3>
                     <h2 id="stat-completed">0</h2>
                 </div>
             </div>
             <div class="stat-card">
-                <div class="stat-icon r-bg"><i class="fas fa-hourglass-half"></i></div>
                 <div class="stat-info">
                     <h3>Appointments Left</h3>
                     <h2 id="stat-left">0</h2>
@@ -113,7 +107,7 @@ $report_times = $check_reports->fetchAll(PDO::FETCH_KEY_PAIR);
         <div style="margin-top: 35px;">
             <div
                 style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; border-bottom: 2px solid #f1f5f9; padding-bottom: 15px;">
-                <h3 style="margin:0; color: #1e293b;"><i class="fas fa-calendar-day"></i> Today's Schedule</h3>
+                <h3 style="margin:0; color: #1e293b;">Today's Schedule</h3>
                 <span id="today-date-display" style="font-size: 0.9em; color: #64748b; font-weight: 500;"></span>
             </div>
             <div id="todays-appointments-list" class="dd-grid">
@@ -124,19 +118,20 @@ $report_times = $check_reports->fetchAll(PDO::FETCH_KEY_PAIR);
 
     <!-- AI Insights Tab -->
     <div id="tab-ai_insights" class="dd-content">
+        <a href="#" class="back-btn" onclick="switchTab(event, 'overview')">Back to Overview</a>
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:25px;">
             <div>
-                <h2 style="margin:0;"><i class="fas fa-microchip" style="color: #6366f1;"></i> AI Clinical Analytics</h2>
+                <h2 style="margin:0;">AI Clinical Analytics</h2>
                 <p style="color: #64748b; margin-top: 5px;">Predictive forecasting and patient follow-up
                     recommendations.</p>
             </div>
-            <button class="dd-btn" onclick="loadAiInsights()"><i class="fas fa-sync"></i> Refresh Data</button>
+            <!-- Refresh Data Button Removed -->
         </div>
 
         <div class="dd-grid" style="grid-template-columns: 1.5fr 1fr; gap: 25px;">
             <!-- Forecasting Section -->
             <div class="dd-card" style="padding: 25px;">
-                <h4 style="margin-bottom: 20px;"><i class="fas fa-chart-line"></i> 7-Day Patient Load Forecast</h4>
+                <h4 style="margin-bottom: 20px;">7-Day Patient Load Forecast</h4>
                 <div id="forecast-container"
                     style="height: 250px; display: flex; align-items: flex-end; justify-content: space-between; padding-top: 20px; border-bottom: 2px solid #e2e8f0; margin-bottom: 15px;">
                     <!-- Loaded via JS -->
@@ -148,7 +143,7 @@ $report_times = $check_reports->fetchAll(PDO::FETCH_KEY_PAIR);
                 <div
                     style="margin-top: 20px; padding: 15px; background: #f0f9ff; border-radius: 8px; border-left: 4px solid #0ea5e9;">
                     <p style="font-size: 0.9em; color: #0c4a6e; margin: 0;">
-                        <i class="fas fa-info-circle"></i> <b>AI Insight:</b> Forecast is based on your historical
+                        <b>AI Insight:</b> Forecast is based on your historical
                         booking trends over the last 60 days.
                     </p>
                 </div>
@@ -156,7 +151,7 @@ $report_times = $check_reports->fetchAll(PDO::FETCH_KEY_PAIR);
 
             <!-- Recommendations Section -->
             <div class="dd-card" style="padding: 25px;">
-                <h4 style="margin-bottom: 20px;"><i class="fas fa-stethoscope"></i> Clinical Suggestions</h4>
+                <h4 style="margin-bottom: 20px;">Clinical Suggestions</h4>
                 <div id="ai-recommendations-list" style="display: flex; flex-direction: column; gap: 15px;">
                     <!-- Loaded via JS -->
                 </div>
@@ -166,10 +161,9 @@ $report_times = $check_reports->fetchAll(PDO::FETCH_KEY_PAIR);
 
     <!-- Active Bookings Tab -->
     <div id="tab-bookings" class="dd-content">
+        <a href="#" class="back-btn" onclick="switchTab(event, 'overview')">Back to Overview</a>
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
             <h2 style="margin:0;">Active Patient Bookings</h2>
-            <button class="dd-btn" onclick="loadDocAppointments('bookings-list', 'scheduled')"><i
-                    class="fas fa-sync"></i> Refresh</button>
         </div>
         <div id="bookings-list" class="dd-grid">
             <!-- Loaded via JS -->
@@ -178,10 +172,9 @@ $report_times = $check_reports->fetchAll(PDO::FETCH_KEY_PAIR);
 
     <!-- Consulted Tab -->
     <div id="tab-consulted" class="dd-content">
+        <a href="#" class="back-btn" onclick="switchTab(event, 'overview')">Back to Overview</a>
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
             <h2 style="margin:0;">Consulted Patients History</h2>
-            <button class="dd-btn" onclick="loadDocAppointments('consulted-list', 'completed')"><i
-                    class="fas fa-sync"></i> Refresh</button>
         </div>
         <div id="consulted-list" class="dd-grid">
             <!-- Loaded via JS -->
@@ -190,10 +183,11 @@ $report_times = $check_reports->fetchAll(PDO::FETCH_KEY_PAIR);
 
     <!-- Settings Tab -->
     <div id="tab-settings" class="dd-content">
+        <a href="#" class="back-btn" onclick="switchTab(event, 'overview')">Back to Overview</a>
         <h2>Profile & Availability</h2>
 
         <div class="dd-card" style="margin-bottom: 25px;">
-            <h4><i class="fas fa-user-edit"></i> Personal Details</h4>
+            <h4>Personal Details</h4>
             <p style="color:var(--text-muted); margin-bottom:20px;">Keep your contact information updated.</p>
             <?php
             $stmtPhone = $pdo->prepare("SELECT phone FROM users WHERE id = ?");
@@ -209,13 +203,9 @@ $report_times = $check_reports->fetchAll(PDO::FETCH_KEY_PAIR);
                 <div class="dd-group">
                     <label>Email Address
                         <?php if (isset($_SESSION['is_verified']) && $_SESSION['is_verified'] == 1): ?>
-                            <span class="badge"
-                                style="background: #2ecc71; color: white; padding: 2px 8px; border-radius: 12px; font-size: 0.75em; margin-left: 5px; vertical-align: middle;"><i
-                                    class="fas fa-check-circle"></i> Verified</span>
+                            <span class="badge" style="background: #2ecc71; color: white; padding: 2px 8px; border-radius: 12px; font-size: 0.75em; margin-left: 5px; vertical-align: middle;">Verified</span>
                         <?php else: ?>
-                            <span class="badge"
-                                style="background: #e74c3c; color: white; padding: 2px 8px; border-radius: 12px; font-size: 0.75em; margin-left: 5px; vertical-align: middle;"><i
-                                    class="fas fa-times-circle"></i> Unverified</span>
+                            <span class="badge" style="background: #e74c3c; color: white; padding: 2px 8px; border-radius: 12px; font-size: 0.75em; margin-left: 5px; vertical-align: middle;">Unverified</span>
                         <?php endif; ?>
                     </label>
                     <input type="email" name="email" class="dd-input"
@@ -229,18 +219,16 @@ $report_times = $check_reports->fetchAll(PDO::FETCH_KEY_PAIR);
                         value="<?php echo htmlspecialchars($currentPhone); ?>" pattern="9[0-9]{9}"
                         title="10 digits starting with 9">
                 </div>
-                <button type="submit" class="dd-btn" style="width:100%;"><i class="fas fa-save"></i> Save Personal
-                    Details</button>
+                <button type="submit" class="dd-btn" style="width:100%;">Save Personal Details</button>
             </form>
         </div>
         <div class="dd-card" style="margin-bottom: 25px;">
-            <h4><i class="fas fa-image"></i> Profile Picture</h4>
+            <h4>Profile Picture</h4>
             <p style="color:var(--text-muted); margin-bottom:20px;">Upload a new image to personalize your account.</p>
             <form action="../logic/common/update_photo.php" method="POST" enctype="multipart/form-data">
                 <input type="file" name="profile_photo" accept="image/*" class="dd-input" required
                     style="margin-bottom:15px; padding: 10px; background: var(--input-bg);">
-                <button type="submit" class="dd-btn" style="width:100%;"><i class="fas fa-upload"></i> Upload
-                    Photo</button>
+                <button type="submit" class="dd-btn" style="width:100%;">Upload Photo</button>
             </form>
         </div>
 
@@ -288,8 +276,7 @@ $report_times = $check_reports->fetchAll(PDO::FETCH_KEY_PAIR);
                         value="<?php echo htmlspecialchars($doctorInfo['end_time']); ?>" required>
                 </div>
             </div>
-            <button type="submit" class="dd-btn" style="width:100%; margin-top: 15px;"><i class="fas fa-save"></i> Save
-                Changes</button>
+            <button type="submit" class="dd-btn" style="width:100%; margin-top: 15px;">Save Changes</button>
         </form>
     </div>
 
@@ -297,7 +284,7 @@ $report_times = $check_reports->fetchAll(PDO::FETCH_KEY_PAIR);
     <div id="tab-search" class="dd-content">
         <div
             style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; border-bottom: 2px solid #f1f5f9; padding-bottom: 15px;">
-            <h2 style="margin:0;"><i class="fas fa-search"></i> Patient Search</h2>
+            <h2 style="margin:0;">Patient Search</h2>
             <p style="color: #64748b; font-size: 0.9em; margin: 0;">Lookup MedScape patient history by ID or Name. <span
                     style="color:var(--primary); font-weight:600;">(Filtered to your hospital)</span></p>
         </div>
@@ -305,14 +292,12 @@ $report_times = $check_reports->fetchAll(PDO::FETCH_KEY_PAIR);
         <div class="dd-card" style="margin-bottom: 25px; padding: 25px; background: #fff;">
             <div style="display: flex; gap: 12px; margin-bottom: 0;">
                 <div style="flex: 1; position: relative;">
-                    <i class="fas fa-id-card"
-                        style="position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: #94a3b8;"></i>
-                    <input type="text" id="patient-search-input" class="dd-input"
-                        style="width: 100%; padding-left: 45px;" placeholder="Search Patient ID or Name..."
-                        onkeyup="handlePatientSearch(event)">
+                    <input type="text" id="patient-search-input" class="dd-input" 
+                           placeholder="Search Patient by Name or ID..." 
+                           oninput="performPatientSearch()"
+                           style="padding-left: 15px;">
                 </div>
-                <button class="dd-btn" onclick="performPatientSearch()" style="padding: 0 30px;"><i
-                        class="fas fa-search"></i> Search</button>
+                <button class="dd-btn" onclick="performPatientSearch()" style="padding: 0 30px;">Search</button>
             </div>
         </div>
 
@@ -344,7 +329,7 @@ $report_times = $check_reports->fetchAll(PDO::FETCH_KEY_PAIR);
 
             <div id="patient-health-summary"
                 style="margin-bottom: 20px; padding: 15px; background: #fff5f5; border-radius: 8px; border: 1px solid #fed7d7; display:none;">
-                <h5 style="margin:0 0 10px 0; color: #c53030;"><i class="fas fa-file-medical-alt"></i> Patient Health
+                <h5 style="margin:0 0 10px 0; color: #c53030;">Patient Health
                     Summary</h5>
                 <div id="ph-details"
                     style="font-size: 0.9em; display: grid; grid-template-columns: 1fr 1fr; gap: 5px; margin-bottom: 10px;">
@@ -367,9 +352,9 @@ $report_times = $check_reports->fetchAll(PDO::FETCH_KEY_PAIR);
             </div>
 
             <div style="margin-top: 15px; border-top: 1px solid #ddd; padding-top: 15px;">
-                <button type="button" class="dd-btn" style="width:100%; background: #f1f5f9; color: #475569;"
+                <button type="button" class="dd-btn" style="width:100%;"
                     onclick="openPatientHistory(document.getElementById('report-pat-id').value, document.getElementById('report-pat-name').value)">
-                    <i class="fas fa-history"></i> Check Full Medical History
+                    Check Full Medical History
                 </button>
             </div>
 
@@ -384,7 +369,7 @@ $report_times = $check_reports->fetchAll(PDO::FETCH_KEY_PAIR);
     <div class="dd-modal" style="max-width: 700px; max-height: 85vh; overflow-y: auto;">
         <div
             style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; border-bottom:1px solid #eee; padding-bottom:10px;">
-            <h3 style="margin:0;"><i class="fas fa-file-medical-alt"></i> Complete Clinical History</h3>
+            <h3 style="margin:0;">Complete Clinical History</h3>
             <button class="dd-close"
                 onclick="document.getElementById('patient-history-modal').classList.remove('active')"
                 style="background:none; border:none; font-size:1.5em; cursor:pointer;">&times;</button>
@@ -401,7 +386,7 @@ $report_times = $check_reports->fetchAll(PDO::FETCH_KEY_PAIR);
     <div class="dd-modal" style="max-width: 600px; max-height: 85vh; overflow-y: auto;">
         <div
             style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; border-bottom:1px solid #eee; padding-bottom:10px;">
-            <h3 style="margin:0;"><i class="fas fa-history"></i> Report History</h3>
+            <h3 style="margin:0;">Report History</h3>
             <button class="dd-close" onclick="document.getElementById('history-modal').classList.remove('active')"
                 style="background:none; border:none; font-size:1.5em; cursor:pointer;">&times;</button>
         </div>
@@ -456,27 +441,31 @@ $report_times = $check_reports->fetchAll(PDO::FETCH_KEY_PAIR);
 </div>
 
 <script>
-    function switchTab(e, tabId) {
-        // UI Updates for Sidebar
-        document.querySelectorAll('.sidebar-menu li').forEach(t => t.classList.remove('active'));
-        document.querySelectorAll('.dd-content').forEach(c => c.classList.remove('active'));
-
-        if (e && e.currentTarget && e.currentTarget.tagName === 'LI') {
-            e.currentTarget.classList.add('active');
+    const parentSwitchTab = window.switchTab;
+    window.switchTab = function(e, tabId) {
+        // Use global switchTab if available
+        if (typeof parentSwitchTab === 'function') {
+            parentSwitchTab(e, tabId);
         } else {
-            const sideItem = document.querySelector(`.sidebar-menu li[data-page="${tabId}"]`);
-            if (sideItem) sideItem.classList.add('active');
+            // UI Updates for Sidebar (fallback)
+            document.querySelectorAll('.sidebar-menu li').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.dd-content').forEach(c => c.classList.remove('active'));
+            if (e && e.currentTarget && e.currentTarget.tagName === 'LI') {
+                e.currentTarget.classList.add('active');
+            } else {
+                const sideItem = document.querySelector(`.sidebar-menu li[data-page="${tabId}"]`);
+                if (sideItem) sideItem.classList.add('active');
+            }
+            const targetTab = document.getElementById(`tab-${tabId}`);
+            if (targetTab) targetTab.classList.add('active');
         }
-
-        const targetTab = document.getElementById(`tab-${tabId}`);
-        if (targetTab) targetTab.classList.add('active');
 
         if (tabId === 'overview') loadDocStats();
         if (tabId === 'ai_insights') loadAiInsights();
         if (tabId === 'bookings') loadDocAppointments('bookings-list', 'scheduled');
-        if (tabId === 'consulted') loadDocAppointments('consulted-list', 'completed');
+        if (tabId === 'consulted') loadConsultedPatients('consulted-list');
     }
-
+    // window.switchTab is now configured and will handle onclick events directly
     async function loadDocStats() {
         try {
             const res = await fetch('../logic/doctor/actions.php?action=get_stats');
@@ -508,7 +497,6 @@ $report_times = $check_reports->fetchAll(PDO::FETCH_KEY_PAIR);
             if (!appts || appts.length === 0) {
                 container.innerHTML = `
                     <div style="text-align:center; padding: 40px; color:#94a3b8; font-size:1.1em; grid-column: 1/-1; background:#f8fafc; border-radius:12px; border: 2px dashed #e2e8f0;">
-                        <i class="fas fa-calendar-day" style="font-size:2em; margin-bottom:10px;"></i><br>
                         No appointments scheduled for today.
                     </div>`;
                 return;
@@ -523,27 +511,34 @@ $report_times = $check_reports->fetchAll(PDO::FETCH_KEY_PAIR);
 
                 return `
                 <div class="dd-card" style="border-left: 4px solid var(--primary);">
-                    <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:15px;">
-                        <h4 style="margin:0;">${a.patient_name}</h4>
-                        <span style="background:var(--primary-light); color:var(--primary); padding:4px 10px; border-radius:6px; font-size:0.85em; font-weight:600;">
-                            ${a.appointment_time.slice(0, 5)}
-                        </span>
+                    <div class="dd-card-header">
+                        <div class="dd-card-title-group">
+                            <h4 style="margin:0;">${a.patient_name}</h4>
+                        </div>
+                        <div class="dd-card-badge-group">
+                            <span style="font-size: 0.75em; color: ${a.payment_status === 'paid' ? '#2ecc71' : '#e74c3c'}; font-weight: 600;">
+                                ${a.payment_status === 'paid' ? 'PAID' : 'UNPAID'}
+                            </span>
+                            <span style="background:var(--primary-light); color:var(--primary); padding:4px 10px; border-radius:6px; font-size:0.85em; font-weight:600;">
+                                ${a.appointment_time.slice(0, 5)}
+                            </span>
+                        </div>
                     </div>
                     <p style="font-size:0.9em; margin-bottom:15px; color:#64748b;">
-                        <i class="fas fa-notes-medical"></i> ${a.reason || 'General Checkup'}
+                        ${a.reason || 'General Checkup'}
                     </p>
                     <div style="display:flex; gap:10px;">
                         ${isAvailable ? `
-                            <button class="dd-btn" style="flex:1; font-size:0.85em; padding:8px;" onclick="openReportModal(${a.id}, '${a.patient_id || ''}', '${a.patient_name}')">
-                                <i class="fas fa-pencil-alt"></i> Consult
+                            <button class="dd-btn btn-with-arrow" style="flex:1; font-size:0.85em; padding:8px;" onclick="openReportModal(${a.id}, '${a.patient_id || ''}', '${a.patient_name}')">
+                                Consult
                             </button>
                         ` : `
                             <button class="dd-btn" style="flex:1; font-size:0.85em; padding:8px; background:#e2e8f0; color:#64748b; cursor:not-allowed;" disabled title="Available 1 hour before scheduled time">
-                                <i class="fas fa-lock"></i> Locked
+                                Locked
                             </button>
                         `}
                         <button class="dd-btn" style="background:#f1f5f9; color:#475569; flex:0.4; font-size:0.85em; padding:8px;" onclick="rescheduleDocAppt(${a.id})">
-                            <i class="fas fa-clock"></i>
+                            Reschedule
                         </button>
                     </div>
                 </div>
@@ -552,6 +547,72 @@ $report_times = $check_reports->fetchAll(PDO::FETCH_KEY_PAIR);
         } catch (e) {
             console.error(e);
             container.innerHTML = '<div style="color:red; grid-column: 1/-1;">Error loading today\'s schedule</div>';
+        }
+    }
+
+    async function loadConsultedPatients(containerId) {
+        try {
+            const res = await fetch(`../logic/doctor/actions.php?action=get_appointments&status=completed`);
+            const appts = await res.json();
+            const container = document.getElementById(containerId);
+            if (!container) return;
+
+            if (!appts || appts.length === 0) {
+                container.innerHTML = `<div style="text-align:center; padding: 40px; color:#aaa; font-size:1.2em; grid-column: 1/-1;">No consulted patients found.</div>`;
+                return;
+            }
+
+            // Group by patient_id
+            const groups = {};
+            appts.forEach(a => {
+                if (!groups[a.patient_id]) {
+                    groups[a.patient_id] = {
+                        patient_name: a.patient_name,
+                        patient_id: a.patient_id,
+                        visits: []
+                    };
+                }
+                groups[a.patient_id].visits.push(a);
+            });
+
+            // Convert to array and sort by last visit date
+            const groupedArray = Object.values(groups).map(g => {
+                g.visits.sort((a, b) => {
+                    const dateA = new Date(`${a.appointment_date}T${a.appointment_time}`);
+                    const dateB = new Date(`${b.appointment_date}T${b.appointment_time}`);
+                    return dateB - dateA;
+                });
+                g.lastVisit = g.visits[0];
+                g.visitCount = g.visits.length;
+                return g;
+            });
+
+            container.innerHTML = groupedArray.map(g => {
+                const a = g.lastVisit;
+                return `
+                <div class="dd-card consulted-group-card" onclick="openPatientHistory(${g.patient_id}, '${escapeQuotes(g.patient_name)}')" style="cursor:pointer; border-left: 4px solid var(--primary);">
+                    <div class="dd-card-header">
+                        <div class="dd-card-title-group">
+                            <h4 style="margin:0 0 5px 0;">${g.patient_name}</h4>
+                            <span style="font-size:0.8em; color:var(--text-muted);">Patient ID: ${g.patient_id}</span>
+                        </div>
+                        <div class="dd-card-badge-group">
+                            <span class="dd-badge" style="background:var(--primary); color:white; border-radius:12px; padding:2px 10px;">${g.visitCount} Visit${g.visitCount > 1 ? 's' : ''}</span>
+                        </div>
+                    </div>
+                    <div style="margin-top:10px; padding-top:10px; border-top:1px solid #f1f5f9;">
+                        <p style="margin:5px 0; font-size:0.9em; color:#475569;"><strong>Last Visit:</strong> ${a.appointment_date}</p>
+                        <p style="margin:5px 0; font-size:0.9em; color:#475569;"><strong>Reason:</strong> ${a.reason || 'General Checkup'}</p>
+                    </div>
+                    <div style="margin-top:15px; text-align:center; font-size:0.8em; font-weight:600; color:var(--primary);">
+                        VIEW FULL VISIT HISTORY
+                    </div>
+                </div>
+                `;
+            }).join('');
+        } catch (e) {
+            console.error(e);
+            container.innerHTML = '<div style="color:red; grid-column: 1/-1;">Error loading consulted patients</div>';
         }
     }
 
@@ -564,7 +625,7 @@ $report_times = $check_reports->fetchAll(PDO::FETCH_KEY_PAIR);
             if (!container) return;
 
             if (!appts || appts.length === 0) {
-                container.innerHTML = `<div style="text-align:center; padding: 40px; color:#aaa; font-size:1.2em; grid-column: 1/-1;"><i class="fas fa-calendar-times"></i><br>No ${status} appointments found.</div>`;
+                container.innerHTML = `<div style="text-align:center; padding: 40px; color:#aaa; font-size:1.2em; grid-column: 1/-1;">No ${status} appointments found.</div>`;
                 return;
             }
 
@@ -581,57 +642,72 @@ $report_times = $check_reports->fetchAll(PDO::FETCH_KEY_PAIR);
 
                 return `
             <div class="dd-card">
-                <span class="dd-badge b-${a.status === 'reschedule_requested' ? 'warning' : a.status}" style="${a.status === 'reschedule_requested' ? 'background:#ff9800; color:#fff;' : ''}">${a.status === 'reschedule_requested' ? 'RESCHEDULE PENDING' : a.status.toUpperCase()}</span>
-                ${isLocked && a.status === 'scheduled' ? `<span class="dd-badge" style="background:#6c757d; color:#fff; top: 45px;"><i class="fas fa-lock"></i> LOCKED</span>` : ''}
-                
-                <h4 style="margin:0 0 10px 0;">Patient: ${a.patient_name} <span style="font-size:0.7em; color:#64748b; margin-left:5px;">(ID: ${a.patient_id})</span></h4>
-                <p style="margin:5px 0;"><strong><i class="far fa-calendar"></i> Date:</strong> ${a.appointment_date}</p>
-                <p style="margin:5px 0;"><strong><i class="far fa-clock"></i> Time:</strong> ${a.appointment_time.slice(0, 5)}</p>
+                <div class="dd-card-header">
+                    <div class="dd-card-title-group">
+                        <h4 style="margin:0 0 10px 0;">Patient: ${a.patient_name} <span style="font-size:0.7em; color:#64748b; margin-left:5px;">(ID: ${a.patient_id})</span></h4>
+                    </div>
+                    <div class="dd-card-badge-group">
+                        ${(!['completed', 'scheduled', 'missed', 'cancelled'].includes(a.status)) ? `
+                            <span class="dd-badge b-${a.status === 'reschedule_requested' ? 'warning' : a.status}" style="${a.status === 'reschedule_requested' ? 'background:#ff9800; color:#fff;' : ''}">${a.status === 'reschedule_requested' ? 'RESCHEDULE PENDING' : a.status.toUpperCase()}</span>
+                        ` : ''}
+                        
+                        ${a.status !== 'completed' ? `
+                            <span class="dd-badge" style="background: ${a.payment_status === 'paid' ? '#2ecc71' : '#e74c3c'}; color: white;">
+                                ${a.payment_status === 'paid' ? 'PAID' : 'UNPAID'}
+                            </span>
+                        ` : ''}
+
+                        ${isLocked && a.status === 'scheduled' ? `<span class="dd-badge" style="background:#6c757d; color:#fff;">LOCKED</span>` : ''}
+                    </div>
+                </div>
+                <p style="margin:5px 0;"><strong>Date:</strong> ${a.appointment_date}</p>
+                <p style="margin:5px 0;"><strong>Time:</strong> ${a.appointment_time.slice(0, 5)}</p>
                 
                 ${a.status === 'completed' && a.report_id ? `
                     <div style="margin-top:20px; display:flex; flex-direction:column; gap:10px;">
                         <div style="display:flex; gap:8px;">
-                            <a href="../logic/doctor/download_report.php?id=${a.report_id}" target="_blank" class="dd-btn" style="flex:2; text-decoration:none; display:block; text-align:center; background:var(--primary); color:white;">
-                                <i class="fas fa-file-download"></i> View Report
+                            <a href="../logic/doctor/download_report.php?id=${a.report_id}" target="_blank" class="dd-btn btn-with-arrow" style="flex:2; text-decoration:none; display:block; text-align:center;">
+                                View Report
                             </a>
-                            <button class="dd-btn" style="flex:0.5; background:#f1f5f9; color:#475569;" onclick="openHistoryModal(${a.report_id})" title="Version History">
-                                <i class="fas fa-history"></i>
+                            <button class="dd-btn" style="flex:0.5;" onclick="openHistoryModal(${a.report_id})" title="Version History">
                             </button>
                         </div>
                         
-                        ${(new Date().getTime() - new Date(a.report_created_at).getTime()) <= 86400000 ? `
+                        ${(new Date().getTime() - new Date(a.appointment_date + 'T' + a.appointment_time).getTime()) <= 3600000 ? `
                             <button class="dd-btn dd-btn-outline" style="width:100%;" onclick="loadReportForEdit(${a.report_id}, '${escapeQuotes(a.patient_name)}')">
-                                <i class="fas fa-edit"></i> Edit Report (24h Window)
+                                Edit Report (1h Window)
                             </button>
                         ` : ''}
                     </div>
                 ` : a.status === 'completed' ? `
-                    <p style="color:#ef4444; font-size:0.9em; margin-top:10px;"><i class="fas fa-exclamation-circle"></i> Missing Report</p>
+                    <p style="color:#ef4444; font-size:0.9em; margin-top:10px;">Missing Report</p>
                 ` : a.status === 'reschedule_requested' ? `
                     <div style="margin-top:20px; padding:15px; background:#fff3e0; border-left:4px solid #ff9800; border-radius:4px;">
-                        <h5 style="margin:0 0 10px 0; color:#e65100;"><i class="fas fa-exclamation-circle"></i> Patient Reschedule Request</h5>
+                        <h5 style="margin:0 0 10px 0; color:#e65100;">Patient Reschedule Request</h5>
                         <p style="margin:0 0 5px 0; font-size:0.95em;">Requested Date: <strong>${a.requested_date}</strong></p>
                         <p style="margin:0 0 15px 0; font-size:0.95em;">Requested Time: <strong>${a.requested_time ? a.requested_time.slice(0, 5) : ''}</strong></p>
                         <div style="display:flex; gap:10px;">
-                            <button class="dd-btn" style="flex:1; background:#2e7d32; color:white;" onclick="approveReschedule(${a.id})"><i class="fas fa-check"></i> Approve</button>
-                            <button class="dd-btn dd-btn-danger" style="flex:1;" onclick="declineReschedule(${a.id})"><i class="fas fa-times"></i> Decline</button>
+                            <button class="dd-btn dd-btn-success" style="flex:1;" onclick="approveReschedule(${a.id})">Approve</button>
+                            <button class="dd-btn dd-btn-danger" style="flex:1;" onclick="declineReschedule(${a.id})">Decline</button>
                         </div>
                     </div>
                 ` : `
                     <div style="margin-top:20px; display:flex; flex-direction:column; gap:8px;">
                         ${isAvailable ? `
-                            <button class="dd-btn" style="width:100%;" onclick="openReportModal(${a.id}, '${a.patient_id || ''}', '${a.patient_name}')"><i class="fas fa-pencil-alt"></i> Consult</button>
+                            <button class="dd-btn btn-with-arrow" style="width:100%;" onclick="openReportModal(${a.id}, '${a.patient_id || ''}', '${a.patient_name}')">
+                                Consult
+                            </button>
                         ` : `
-                            <button class="dd-btn" style="width:100%; background:#e2e8f0; color:#64748b; cursor:not-allowed;" disabled title="Available 1 hour before scheduled time"><i class="fas fa-lock"></i> Locked (Available 1 hour before)</button>
+                            <button class="dd-btn" style="width:100%; background:transparent; border-color:var(--gray-300); color:var(--gray-400); cursor:not-allowed;" disabled title="Available 1 hour before scheduled time">Locked (Available 1 hour before)</button>
                         `}
                         ${!isLocked ? `
                             <div style="display:flex; gap:10px;">
-                                <button class="dd-btn" style="flex:1; background:var(--primary); color:white;" onclick="rescheduleDocAppt(${a.id})"><i class="fas fa-calendar-alt"></i> Reschedule</button>
-                                <button class="dd-btn dd-btn-danger" style="flex:1;" onclick="cancelDocAppt(${a.id})"><i class="fas fa-times"></i> Cancel</button>
+                                <button class="dd-btn" style="flex:1;" onclick="rescheduleDocAppt(${a.id})">Reschedule</button>
+                                <button class="dd-btn dd-btn-danger" style="flex:1;" onclick="cancelDocAppt(${a.id})">Cancel</button>
                             </div>
                         ` : `
                             <div style="padding:10px; background: #f8fafc; border-radius: 6px; text-align:center; font-size: 0.85em; color: #64748b; border: 1px dashed #cbd5e1; display:flex; align-items:center; justify-content:center;">
-                                <i class="fas fa-lock" style="margin-right:5px;"></i> Scheduling Locked
+                                Scheduling Locked
                             </div>
                         `}
                     </div>
@@ -916,11 +992,11 @@ $report_times = $check_reports->fetchAll(PDO::FETCH_KEY_PAIR);
                             <button class="dd-btn" style="padding: 6px 12px; font-size: 0.8em; flex: 1;" onclick="handleRecommendation(${r.id}, 'accepted', ${r.patient_id}, '${escapeQuotes(r.title)}')">
                                 <i class="fas fa-check"></i> Action
                             </button>
-                            <button class="dd-btn" style="padding: 6px 12px; font-size: 0.8em; background: transparent; border: 1px solid #cbd5e1; color: #64748b;" onclick="handleRecommendation(${r.id}, 'ignored')">
+                            <button class="dd-btn dd-btn-outline" style="padding: 6px 12px; font-size: 0.8em; color: #64748b;" onclick="handleRecommendation(${r.id}, 'ignored')">
                                 Ignore
                             </button>
                         </div>
-                        <i class="fas fa-times" style="position: absolute; top: 12px; right: 12px; color: #94a3b8; cursor: pointer; font-size: 0.9em;" onclick="handleRecommendation(${r.id}, 'dismissed')" title="Dismiss"></i>
+                        <span style="position: absolute; top: 12px; right: 12px; color: #94a3b8; cursor: pointer; font-size: 0.9em;" onclick="handleRecommendation(${r.id}, 'dismissed')" title="Dismiss">&times;</span>
                     </div>
                 `;
             } else {
@@ -984,7 +1060,7 @@ $report_times = $check_reports->fetchAll(PDO::FETCH_KEY_PAIR);
         const container = document.getElementById('patient-search-results');
 
         if (!query.trim()) {
-            showToast("Please enter an ID or Name", 'error');
+            container.innerHTML = '';
             return;
         }
 
@@ -1005,11 +1081,11 @@ $report_times = $check_reports->fetchAll(PDO::FETCH_KEY_PAIR);
                         <h4 style="margin:0;">${p.name}</h4>
                         <span style="font-size:0.75em; background:#f1f5f9; color:#64748b; padding:2px 8px; border-radius:4px; font-weight:600;">ID: ${p.id}</span>
                     </div>
-                    <p style="font-size:0.85em; margin-bottom:5px;"><i class="fas fa-envelope"></i> ${p.email}</p>
-                    <p style="font-size:0.85em; margin-bottom:15px;"><i class="fas fa-phone"></i> ${p.phone || 'No phone listed'}</p>
+                    <p style="font-size:0.85em; margin-bottom:5px;">${p.email}</p>
+                    <p style="font-size:0.85em; margin-bottom:15px;">${p.phone || 'No phone listed'}</p>
                     
                     <button class="dd-btn" style="width:100%;" onclick="openPatientHistory(${p.id}, '${escapeQuotes(p.name)}')">
-                        <i class="fas fa-history"></i> Review Full History
+                        Review Full History
                     </button>
                 </div>
             `).join('');
@@ -1029,7 +1105,7 @@ $report_times = $check_reports->fetchAll(PDO::FETCH_KEY_PAIR);
             const records = await res.json();
 
             if (!records || records.length === 0) {
-                container.innerHTML = '<div style="text-align:center; padding:40px; color:#64748b;"><i class="fas fa-folder-open" style="font-size:2em; margin-bottom:10px;"></i><br>No consultation records found for this patient.</div>';
+                container.innerHTML = '<div style="text-align:center; padding:40px; color:#64748b;">No consultation records found for this patient.</div>';
                 return;
             }
 
@@ -1056,6 +1132,21 @@ $report_times = $check_reports->fetchAll(PDO::FETCH_KEY_PAIR);
                         <div style="font-size:0.75em; color:var(--primary); font-weight:700; margin-bottom:5px; text-transform:uppercase;">Prescription / Meds</div>
                         <p style="margin:0; font-size:0.9em; color:#1e293b; white-space: pre-wrap;">${r.prescription}</p>
                     </div>
+
+                    <div style="margin-top:15px; display:flex; gap:10px;">
+                        <a href="../logic/doctor/download_report.php?id=${r.id}" target="_blank" class="dd-btn btn-with-arrow" style="flex:1; text-decoration:none; display:block; text-align:center; padding: 6px; font-size: 0.85em;">
+                            Download PDF
+                        </a>
+                        <button class="dd-btn" style="flex:1; padding: 6px; font-size: 0.85em;" onclick="openHistoryModal(${r.id})" title="Version History">
+                            Version History
+                        </button>
+                    </div>
+                    
+                    ${(r.is_owner == 1 && (new Date().getTime() - new Date(r.appointment_date + 'T' + r.appointment_time).getTime()) <= 3600000) ? `
+                        <button class="dd-btn dd-btn-outline" style="width:100%; margin-top: 10px; padding: 6px; font-size: 0.85em;" onclick="document.getElementById('patient-history-modal').classList.remove('active'); loadReportForEdit(${r.id}, '${escapeQuotes(patientName)}')">
+                            Edit Report (1h Window)
+                        </button>
+                    ` : ''}
                 </div>
             `).join('');
         } catch (e) { container.innerHTML = '<p style="color:red; text-align:center;">Error accessing patient history portal</p>'; }

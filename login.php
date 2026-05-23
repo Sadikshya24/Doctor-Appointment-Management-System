@@ -10,8 +10,11 @@ require_once 'includes/layout/header.php'; ?>
     <div class="auth-card">
 
         <div class="auth-header">
+            <a href="index.php" class="back-link" style="position: absolute; top: 20px; left: 20px; text-decoration: none; color: var(--text-muted); font-size: 0.9rem; display: flex; align-items: center; gap: 5px;">
+                <i class="fas fa-arrow-left"></i> Home
+            </a>
             <h2>MedScape</h2>
-            <p>Manage your doctor appointments securely</p>
+            <p>Manage your doctor appointments easily</p>
         </div>
 
 
@@ -49,7 +52,7 @@ require_once 'includes/layout/header.php'; ?>
 
                 <a href="forgot_password.php" class="forgot-link">Forgot Password?</a>
 
-                <button type="submit" class="btn">Login</button>
+                <button type="submit" class="btn btn-with-arrow">Login <i class="fas fa-chevron-right nav-arrow"></i></button>
 
 
             </form>
@@ -76,10 +79,9 @@ require_once 'includes/layout/header.php'; ?>
                 </div>
                 <div class="input-field password-field">
                     <i class="fas fa-lock"></i>
-                    <input type="password" name="password" placeholder="Password" 
+                    <input type="password" name="password" placeholder="Password"
                         pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$"
-                        title="At least 8 characters, with uppercase, lowercase, number and special char"
-                        required />
+                        title="At least 8 characters, with uppercase, lowercase, number and special char" required />
                     <i class="fas fa-eye toggle-password" title="Toggle password visibility"></i>
                 </div>
                 <p style="font-size: 0.72rem; color: var(--text-muted); margin: -10px 0 10px 5px; line-height: 1.2;">
@@ -108,7 +110,8 @@ require_once 'includes/layout/header.php'; ?>
                     </div>
                     <div class="input-field">
                         <i class="fas fa-id-card"></i>
-                        <input type="text" name="nmc_number" id="nmc_number" placeholder="NMC Number" pattern="[0-9]{3,6}" title="Numeric and 3-6 digits only" />
+                        <input type="text" name="nmc_number" id="nmc_number" placeholder="NMC Number"
+                            pattern="[0-9]{3,6}" title="Numeric and 3-6 digits only" />
                     </div>
                     <div class="input-field" style="height: auto; padding: 12px 15px; display: block;">
                         <label
@@ -119,7 +122,7 @@ require_once 'includes/layout/header.php'; ?>
                     </div>
                 </div>
 
-                <button type="submit" class="btn">Sign Up</button>
+                <button type="submit" class="btn btn-with-arrow">Sign Up <i class="fas fa-chevron-right nav-arrow"></i></button>
 
 
             </form>

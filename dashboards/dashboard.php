@@ -105,7 +105,7 @@ require_once '../includes/layout/header.php';
                                     style="width: 100%; border: none; padding: 10px; background: transparent; color: var(--text-main);">
                             </div>
                             <button type="submit" class="btn btn-admin"
-                                style="width: 100%; padding: 12px; background: var(--primary-color); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600;">Register
+                                style="width: 100%; padding: 12px; background: var(--primary); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600;">Register
                                 Hospital</button>
                         </form>
                     </div>
