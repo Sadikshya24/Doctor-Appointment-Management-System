@@ -3,6 +3,7 @@ session_start();
 require_once '../includes/core/session_check.php';
 require_once '../includes/core/db.php';
 require_once '../includes/layout/dashboard_layout.php';
+require_once '../logic/patient/stripe_config.php';
 
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'patient') {
     header('Location: ../index.php');
@@ -31,6 +32,7 @@ $menuItems = [
     ['id' => 'book', 'label' => 'Book Appointment', 'icon' => 'fas fa-calendar-plus', 'active' => false],
     ['id' => 'appointments', 'label' => 'My Appointments', 'icon' => 'fas fa-notes-medical', 'active' => false],
     ['id' => 'reports', 'label' => 'Medical Reports', 'icon' => 'fas fa-file-medical', 'active' => false],
+    ['id' => 'ai_assistant', 'label' => 'AI Symptom Checker', 'icon' => 'fas fa-robot', 'active' => false],
     ['id' => 'profile', 'label' => 'My Profile', 'icon' => 'fas fa-user-circle', 'active' => false],
 ];
 

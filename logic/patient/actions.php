@@ -4,6 +4,7 @@ if (session_status() === PHP_SESSION_NONE) {
 }
 require_once '../../includes/core/session_check.php';
 require_once '../../includes/core/db.php';
+require_once '../../includes/core/email_helper.php';
 require_once __DIR__ . '/stripe_config.php';
 
 header('Content-Type: application/json');
@@ -143,6 +144,15 @@ try {
             ]);
             $appointment_id = $pdo->lastInsertId();
 
+            // Notify Doctor
+            $stmt_doc = $pdo->prepare("SELECT user_id FROM doctors WHERE id = ?");
+            $stmt_doc->execute([$doctor_id]);
+            $doc_user_id = $stmt_doc->fetchColumn();
+            if ($doc_user_id) {
+                $stmt_notif = $pdo->prepare("INSERT INTO notifications (user_id, title, message, type) VALUES (?, ?, ?, 'info')");
+                $stmt_notif->execute([$doc_user_id, 'New Appointment Booking', 'A new appointment has been booked for ' . $appointment_date . ' at ' . $appointment_time . '. (Booking ID: #' . $booking_id . ')']);
+            }
+
             // Create Stripe Checkout Session
             $base_url = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://$_SERVER[HTTP_HOST]" . dirname(dirname(dirname($_SERVER['REQUEST_URI'])));
             $success_url = $base_url . "/logic/patient/stripe_success.php?session_id={CHECKOUT_SESSION_ID}";
@@ -175,7 +185,6 @@ try {
             error_log("Booking failed: User ID " . $_SESSION['user_id'] . " attempting to book Doctor ID " . $doctor_id . ". SQL Error: " . $e->getMessage());
             throw $e;
         }
-
     }
 
     if ($action === 'get_appointments') {
@@ -183,7 +192,7 @@ try {
         $pdo->exec("UPDATE appointments SET status = 'missed' WHERE status IN ('scheduled', 'reschedule_requested') AND CONCAT(appointment_date, ' ', appointment_time) < '$current_datetime'");
 
         $stmt = $pdo->prepare("SELECT a.id, a.booking_id, a.doctor_id, a.appointment_date, a.appointment_time, a.status, a.reason, 
-                                      a.requested_date, a.requested_time, a.payment_status, a.payment_intent_id,
+                                      a.requested_date, a.requested_time, a.payment_status, a.payment_intent_id, a.amount_paid, a.final_amount_npr,
                                       d.speciality, du.name AS doctor_name, du.status AS doctor_status, 
                                       hu.name AS hospital_name, hu.status AS hospital_status
                                FROM appointments a 
@@ -225,44 +234,6 @@ try {
         exit;
     }
 
-    if ($action === 'refund_appointment') {
-        $appointment_id = $_POST['appointment_id'] ?? '';
-        if (!$appointment_id) {
-            echo json_encode(["status" => "error", "message" => "Missing appointment ID."]);
-            exit;
-        }
-
-        $stmt = $pdo->prepare("SELECT payment_intent_id, status, payment_status FROM appointments WHERE id = ? AND patient_id = ?");
-        $stmt->execute([$appointment_id, $_SESSION['user_id']]);
-        $app = $stmt->fetch();
-
-        if (!$app) {
-            echo json_encode(["status" => "error", "message" => "Appointment not found."]);
-            exit;
-        }
-
-        if ($app['payment_status'] !== 'paid' || !$app['payment_intent_id']) {
-            echo json_encode(["status" => "error", "message" => "Appointment is not eligible for refund."]);
-            exit;
-        }
-
-        // Initiate Stripe Refund
-        try {
-            $refund_data = [
-                'payment_intent' => $app['payment_intent_id']
-            ];
-            stripe_api_request('POST', 'refunds', $refund_data);
-
-            $update = $pdo->prepare("UPDATE appointments SET status = 'cancelled', payment_status = 'refunded' WHERE id = ?");
-            $update->execute([$appointment_id]);
-
-            echo json_encode(["status" => "success", "message" => "Refund processed successfully."]);
-        } catch (Exception $e) {
-            error_log("Refund failed: " . $e->getMessage());
-            echo json_encode(["status" => "error", "message" => "Refund failed. Please contact support."]);
-        }
-        exit;
-    }
     if ($action === 'reschedule_appointment') {
         $appointment_id = $_POST['appointment_id'] ?? '';
         $new_date = $_POST['appointment_date'] ?? '';
@@ -324,7 +295,7 @@ try {
         }
 
         $stmt = $pdo->prepare("UPDATE appointments SET requested_date = ?, requested_time = ?, status = 'reschedule_requested' WHERE id = ? AND patient_id = ?");
-        $stmt->execute([$new_date, $new_time, (int) $appointment_id, (int) $_SESSION['user_id']]);
+        $stmt->execute([$new_date, $new_time, (int)$appointment_id, (int)$_SESSION['user_id']]);
 
         echo json_encode(["status" => "success", "message" => "Reschedule request submitted successfully! Waiting for doctor approval."]);
         exit;
@@ -340,7 +311,7 @@ try {
         $stmt = $pdo->prepare("SELECT a.*, du.name AS doctorName FROM appointments a 
                                JOIN doctors d ON a.doctor_id = d.id 
                                JOIN users du ON d.user_id = du.id 
-                               WHERE a.booking_id = ? AND a.patient_id = ? AND a.status = 'pending_payment'");
+                               WHERE a.booking_id = ? AND a.patient_id = ? AND a.payment_status = 'pending' AND a.status NOT IN ('cancelled', 'missed', 'refunded')");
         $stmt->execute([$booking_id, $_SESSION['user_id']]);
         $appt = $stmt->fetch();
 
@@ -376,6 +347,66 @@ try {
         }
         exit;
     }
+
+    if ($action === 'refund_appointment') {
+        $appointment_id = $_POST['appointment_id'] ?? '';
+        if (!$appointment_id) {
+            echo json_encode(["status" => "error", "message" => "Missing appointment ID."]);
+            exit;
+        }
+
+        $stmt = $pdo->prepare("SELECT booking_id, amount_paid, payment_intent_id, status, payment_status, appointment_date, appointment_time FROM appointments WHERE id = ? AND patient_id = ?");
+        $stmt->execute([$appointment_id, $_SESSION['user_id']]);
+        $app = $stmt->fetch();
+
+        if (!$app) {
+            echo json_encode(["status" => "error", "message" => "Appointment not found."]);
+            exit;
+        }
+
+        $appointment_datetime = strtotime($app['appointment_date'] . ' ' . $app['appointment_time']);
+        if ($appointment_datetime - time() < 7200) {
+            echo json_encode(["status" => "error", "message" => "Cannot cancel and refund appointment less than 2 hours before the scheduled time."]);
+            exit;
+        }
+
+        if ($app['payment_status'] !== 'paid' || !$app['payment_intent_id']) {
+            echo json_encode(["status" => "error", "message" => "Appointment is not eligible for refund."]);
+            exit;
+        }
+
+        // Initiate Stripe Refund
+        try {
+            $refund_data = [
+                'payment_intent' => $app['payment_intent_id']
+            ];
+            stripe_api_request('POST', 'refunds', $refund_data);
+
+            $update = $pdo->prepare("UPDATE appointments SET status = 'cancelled', payment_status = 'refunded' WHERE id = ?");
+            $update->execute([$appointment_id]);
+
+            // Send Refund Email
+            $email = $_SESSION['email'];
+            $name = $_SESSION['name'];
+            $booking_id = $app['booking_id'];
+            $amount = $app['amount_paid'] ?: 'the consultation fee';
+            
+            $subject = "Refund Processed - Booking #$booking_id";
+            $body = "Hello $name,<br><br>"
+                  . "Your refund for appointment booking <b>#$booking_id</b> has been successfully processed.<br>"
+                  . "An amount of <b>$amount</b> has been credited back to your original payment method.<br>"
+                  . "Your appointment has been cancelled.<br><br>"
+                  . "Thank you for using MedScape.";
+            sendEmail($email, $subject, $body);
+
+            echo json_encode(["status" => "success", "message" => "Refund processed successfully."]);
+        } catch (Exception $e) {
+            error_log("Refund failed: " . $e->getMessage());
+            echo json_encode(["status" => "error", "message" => "Refund failed. Please contact support."]);
+        }
+        exit;
+    }
+
     if ($action === 'update_health_info') {
         $age = $_POST['age'] ?? null;
         $height = $_POST['height'] ?? '';
@@ -418,7 +449,7 @@ try {
                 $file_path = 'uploads/patient_records/' . $new_filename;
                 $file_path = 'uploads/patient_records/' . $new_filename;
                 $stmt = $pdo->prepare("INSERT INTO patient_files (user_id, file_name, file_path) VALUES (?, ?, ?)");
-                $stmt->execute([(int) $_SESSION['user_id'], $file_name, $file_path]);
+                $stmt->execute([(int)$_SESSION['user_id'], $file_name, $file_path]);
                 echo json_encode(["status" => "success", "message" => "File uploaded successfully!"]);
             } else {
                 echo json_encode(["status" => "error", "message" => "Failed to save file."]);
@@ -429,7 +460,7 @@ try {
 
     if ($action === 'get_health_files') {
         $stmt = $pdo->prepare("SELECT * FROM patient_files WHERE user_id = ? ORDER BY created_at DESC");
-        $stmt->execute([(int) $_SESSION['user_id']]);
+        $stmt->execute([(int)$_SESSION['user_id']]);
         echo json_encode($stmt->fetchAll());
         exit;
     }
