@@ -201,7 +201,7 @@ INSERT INTO `users` (`id`, `name`, `email`, `phone`, `password_hash`, `role`, `s
 (12, 'Pranati Thapa', 'budhacmallika@gmail.com', '9855555555', '$2y$10$K1Vx6K9OaJX/9kE8aBZh4eYVYx7bVdK6hO9c/6Qj8sU5T6JvE1yWu', 'doctor', 'active', 1),
 (13, 'Pending Doctor', 'pendingdoc@example.com', '9866666666', '$2y$10$K1Vx6K9OaJX/9kE8aBZh4eYVYx7bVdK6hO9c/6Qj8sU5T6JvE1yWu', 'doctor', 'active', 1),
 (14, 'Kshitiz Shah', 'patientkshitiz@gmail.com', '9877777777', '$2y$10$K1Vx6K9OaJX/9kE8aBZh4eYVYx7bVdK6hO9c/6Qj8sU5T6JvE1yWu', 'patient', 'active', 1),
-(15, 'Crystal Lama', 'patientcrystal@gmail.com', '9888888888', '$2y$10$K1Vx6K9OaJX/9kE8aBZh4eYVYx7bVdK6hO9c/6Qj8sU5T6JvE1yWu', 'patient', 'active', 1);
+(15, 'Crystal Lama', 'jesanglimbu479@gmail.com', '9888888888', '$2y$10$K1Vx6K9OaJX/9kE8aBZh4eYVYx7bVdK6hO9c/6Qj8sU5T6JvE1yWu', 'patient', 'active', 1);
 
 -- 2. Hospitals (linking to user IDs)
 INSERT INTO `hospitals` (`id`, `user_id`, `province`, `city`, `location`, `description`) VALUES
