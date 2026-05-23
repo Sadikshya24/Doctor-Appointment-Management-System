@@ -1,0 +1,110 @@
+/* assets/css/common/buttons.css */
+
+/* Base Button Style */
+.btn-global {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2);
+    padding: var(--space-2) var(--space-5);
+    border-radius: var(--radius-md);
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-semibold);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    font-family: var(--font-main);
+    text-decoration: none;
+}
+
+/* Outlined Variants (Transparent Background, Colored Border and Text) */
+
+/* Primary - Blue */
+.btn-outline-primary {
+    background: transparent !important;
+    border: 1px solid var(--gray-200) !important;
+    color: var(--primary) !important;
+}
+
+.btn-outline-primary:hover {
+    background: var(--primary-light) !important;
+    color: var(--primary-hover) !important;
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-sm);
+}
+
+/* Success - Green */
+.btn-outline-success {
+    background: transparent !important;
+    border: 1px solid var(--gray-200) !important;
+    color: var(--success) !important;
+}
+
+.btn-outline-success:hover {
+    background: var(--success-light) !important;
+    color: #059669 !important;
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-sm);
+}
+
+/* Danger - Red */
+.btn-outline-danger {
+    background: transparent !important;
+    border: 1px solid var(--gray-200) !important;
+    color: var(--danger) !important;
+}
+
+.btn-outline-danger:hover {
+    background: var(--danger-light) !important;
+    color: #be123c !important;
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-sm);
+}
+
+/* Warning - Orange/Yellow */
+.btn-outline-warning {
+    background: transparent !important;
+    border: 1px solid var(--gray-200) !important;
+    color: var(--warning) !important;
+}
+
+.btn-outline-warning:hover {
+    background: var(--warning-light) !important;
+    color: #d97706 !important;
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-sm);
+}
+
+/* Modern Primary Button - Used in forms and profile */
+.btn-primary-modern {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2);
+    background: transparent !important;
+    color: var(--primary) !important;
+    border: 1px solid var(--gray-200) !important;
+    padding: var(--space-3) var(--space-5);
+    border-radius: var(--radius-sm);
+    font-weight: var(--fw-bold);
+    cursor: pointer;
+    transition: all var(--transition-base);
+    font-family: var(--font-main);
+    text-decoration: none;
+    font-size: var(--fs-base);
+}
+
+.btn-primary-modern:hover {
+    background: var(--primary-light) !important;
+    color: var(--primary-hover) !important;
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+/* Button with Arrow interaction */
+.btn-with-arrow .nav-arrow {
+    transition: transform var(--transition-base);
+}
+
+.btn-with-arrow:hover .nav-arrow {
+    transform: translateX(4px);
+}

@@ -1,0 +1,277 @@
+@import url('tokens.css');
+
+/* Landing Page Harmonization */
+body {
+    background-color: var(--bg-body);
+    margin: 0;
+    font-family: var(--font-main);
+    color: var(--text-main);
+    line-height: var(--lh-base);
+}
+
+.landing-hero {
+    position: relative;
+    text-align: center;
+    padding: 120px var(--space-5) 100px;
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%);
+    color: var(--white);
+    border-radius: 0 0 40px 40px;
+    margin-bottom: var(--space-16);
+    box-shadow: var(--shadow-lg);
+    overflow: hidden;
+}
+
+.landing-hero::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.15) 0%, transparent 60%);
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+.landing-hero h1 {
+    font-size: var(--fs-5xl);
+    margin-bottom: var(--space-6);
+    font-weight: var(--fw-extrabold);
+    letter-spacing: -1.5px;
+    position: relative;
+    z-index: 2;
+    line-height: var(--lh-tight);
+}
+
+.landing-hero p {
+    font-size: var(--fs-lg);
+    max-width: 700px;
+    margin: 0 auto var(--space-12);
+    opacity: 0.9;
+    line-height: var(--lh-relaxed);
+    position: relative;
+    z-index: 2;
+}
+
+.btn-hero {
+    display: inline-block;
+    background-color: transparent;
+    color: var(--white);
+    padding: var(--space-4) var(--space-12);
+    border-radius: var(--radius-full);
+    font-weight: var(--fw-bold);
+    font-size: var(--fs-lg);
+    text-decoration: none;
+    transition: all var(--transition-base);
+    box-shadow: var(--shadow-md);
+    position: relative;
+    z-index: 2;
+    border: 2px solid var(--gray-200);
+}
+
+.btn-hero:hover {
+    transform: translateY(-4px) scale(1.02);
+    box-shadow: var(--shadow-lg);
+    background: var(--white);
+    color: var(--primary);
+}
+
+.top-nav {
+    position: absolute;
+    top: var(--space-8);
+    right: var(--space-10);
+    z-index: 10;
+}
+
+.btn-login {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    color: var(--white);
+    padding: var(--space-3) var(--space-8);
+    border-radius: var(--radius-full);
+    text-decoration: none;
+    font-weight: var(--fw-semibold);
+    border: 1.5px solid rgba(255, 255, 255, 0.2);
+    transition: all var(--transition-base);
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+}
+
+.btn-login:hover {
+    background: var(--white);
+    color: var(--primary);
+    transform: translateY(-2px);
+}
+
+.nav-arrow {
+    transition: transform var(--transition-base);
+    display: inline-block;
+}
+
+.btn-with-arrow {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+}
+
+.btn-with-arrow:hover .nav-arrow {
+    transform: translateX(4px);
+}
+
+.stats-container {
+    display: flex;
+    justify-content: center;
+    gap: var(--space-8);
+    padding: 0 var(--space-5) var(--space-16);
+    flex-wrap: wrap;
+    max-width: 1240px;
+    margin: 0 auto;
+}
+
+.stat-card-landing {
+    background: var(--bg-card);
+    border-radius: var(--radius-xl);
+    padding: var(--space-12) var(--space-8);
+    text-align: center;
+    flex: 1;
+    min-width: 280px;
+    box-shadow: var(--shadow-md);
+    transition: all var(--transition-base);
+    border: 1px solid var(--border-color);
+    position: relative;
+    overflow: hidden;
+}
+
+.stat-card-landing:hover {
+    transform: translateY(-12px);
+    box-shadow: var(--shadow-lg);
+    border-color: var(--primary);
+}
+
+.stat-card-landing i {
+    font-size: var(--fs-5xl);
+    background: -webkit-linear-gradient(45deg, var(--primary), #818cf8);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: var(--space-6);
+    display: inline-block;
+}
+
+.stat-card-landing h3 {
+    font-size: var(--fs-4xl);
+    color: var(--text-main);
+    margin: 0 0 var(--space-2);
+    font-weight: var(--fw-extrabold);
+    letter-spacing: -1px;
+}
+
+.stat-card-landing p {
+    color: var(--text-muted);
+    font-weight: var(--fw-semibold);
+    font-size: var(--fs-sm);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin: 0;
+}
+
+.features-section {
+    padding: 100px var(--space-6);
+    background-color: var(--bg-body);
+    text-align: center;
+}
+
+.features-section h2 {
+    font-size: var(--fs-4xl);
+    color: var(--text-main);
+    margin-bottom: var(--space-16);
+    font-weight: var(--fw-extrabold);
+    position: relative;
+    display: inline-block;
+}
+
+.features-section h2::after {
+    content: '';
+    position: absolute;
+    bottom: -15px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80px;
+    height: 6px;
+    background: linear-gradient(90deg, var(--primary), #818cf8);
+    border-radius: 3px;
+}
+
+.features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: var(--space-8);
+    max-width: 1240px;
+    margin: 0 auto;
+}
+
+.feature-item {
+    padding: var(--space-10);
+    border-radius: var(--radius-xl);
+    background-color: var(--bg-card);
+    transition: all var(--transition-base);
+    border: 1px solid var(--border-color);
+    box-shadow: var(--shadow-sm);
+    text-align: left;
+}
+
+.feature-item:hover {
+    transform: translateY(-8px);
+    box-shadow: var(--shadow-md);
+    border-color: var(--primary);
+}
+
+.feature-icon-box {
+    width: 64px;
+    height: 64px;
+    background-color: var(--primary-light);
+    border-radius: var(--radius-lg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: var(--space-6);
+    color: var(--primary);
+    font-size: var(--fs-2xl);
+}
+
+.feature-item h3 {
+    font-size: var(--fs-xl);
+    color: var(--text-main);
+    margin-bottom: var(--space-4);
+    font-weight: var(--fw-bold);
+}
+
+.feature-item p {
+    color: var(--text-muted);
+    line-height: var(--lh-relaxed);
+    font-size: var(--fs-base);
+    margin: 0;
+}
+
+@media (max-width: 768px) {
+    .landing-hero h1 {
+        font-size: var(--fs-3xl);
+    }
+
+    .landing-hero p {
+        font-size: var(--fs-base);
+    }
+
+    .top-nav {
+        right: var(--space-5);
+        top: var(--space-5);
+    }
+
+    .stat-card-landing {
+        padding: var(--space-10) var(--space-6);
+    }
+
+    .stat-card-landing h3 {
+        font-size: var(--fs-3xl);
+    }
+}
